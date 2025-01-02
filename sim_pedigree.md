@@ -1,88 +1,100 @@
-#' ---
-#' title: "simPed: as simulation scheme pedigrees with Mendelian and complex traits"
-#' output: github_document
-#' author: Wouter van Rheenen
-#' date: "`r format(Sys.time(), '%d %B %Y')`"
-#' ---
-#'
+simPed: as simulation scheme pedigrees with Mendelian and complex traits
+================
+Wouter van Rheenen
+02 January 2025
 
-#' ## To do's
+## To do’s
+
+``` r
 #TODO: recode lambda to vector with length of k to vary over generations
 #TODO: calculate penetrance per pedigree and check if this works
+```
 
-#' ## General outline of simulation scheme
-#' 
-#' ### Simulating family members:
-#' The pedigree consists of core pedigree (C) with one single founder this is 
-#' initiated by function `init_ped()`. 
-#' 
-#' Then offspring generation will be simulated using the `add_gen()`
-#' function, IDs start with "C" and number reflects order of offspring (C0_0 for oldest, C0_1 for second child)
-#' in third generation offspring of oldest is denoted as C0_0_[0-9] and second 
-#' C0_1_[0-9] etc. etc.. Therefore, all individuals in this lineage IDs can be 
-#' traced to founder. The `add_gen()` function starts with simulating the spouse.
-#' The number of offspring is samles from a Poisson distribution with mean
-#' number of offspring $\lambda =$ `lambda`. The spouses married into this pedigree are denoted with 
-#' "P*" and have same code as partner (P_0_0 for partner of firs child in 
-#' generation 2). The number of generations to be added is defined by `k`, so for
-#' `k=2` a three-generation pedigree is simulated.
-#' 
-#' When all generations of core pedigree are simulated, we simulate the in-laws 
-#' e.g. the ancestors of the married in spouses (P*) using the `add_inlaws()`
-#' function. 
-#' 
-#' To complete the pedigree, we simulate offspring of the inlaws using `add_ext_branches()`. 
-#' These individuals are unlinked to the core pedigree, e.g. sibs, cousins, etc. 
-#' of the spouses married in to this pedigree.
-#' 
-#' ### Genetics and phenotypes
-#' #### Mendelian disease alleles
-#' The founder of the core pedigree can be defined to carry a pathogenic mutation,
-#' when `init_ped(monogenic=TRUE)` is used. For now, this disease allele is autosomal,
-#' so probability of transmission is 0.5. For spouses married into this pedigree,
-#' the probability of carrying the disease allele is defined by the disease-allele
-#' frequency (`DAF`). Note, disease alleles introduced by spouses can be transmitted
-#' in the core pedigree as well. This can be prevented by setting `DAF=0`.
-#' 
-#' The probability of developing the disease is defined by the disease-allele
-#' penetrance `penetrance`. Therefore, the disease is modeled to be autosomal dominant with or without reduced penetrance.
-#' 
-#' #### Polygenic model
-#' The general polygenic model is defined by $P = G + E$ where the phenotypic value ($P$)
-#' is the sum of a genetic value ($G$) and non-genetic value ($E$). The phenotypic
-#' value $P$ is standardized to zero mean and unit variance and thus follows $N(0,1)$.
-#' The heritabiliy ($h^2$), defined as the proportion of phenotypic variance ($V_p$) explained by
-#' additive genetic variance. The non-genetic component has variance $1 - h^2$ by definition.
-#' 
-#' For a founder $G$ can be drawn from $N(0,h^2)$. For offspring of parents $p$ and $m$
-#' with genetic values of $G_p$ and $G_m$ respectively $G_{offspring} ~ N(\frac{G_p + G_m}{2},\frac{1}{2}h^2)$ 
-#' of small pedigree G can be simulated using a multivariate normal distribution.
-#' This requires looping through all offspring which can be slow. Alternatively,
-#' for simulating a large number of small pedigrees up to four generations, G can
-#' be simulating from a multivariate normal distribution (`MASS::mvrnorm()` or 
-#' `mvnfast::rmvn()`) where the variance-covariance matrix is defined as
-#' $2*h^2*\textbf{K}$ where $\textbf{K}$ is the kinship matrix of the pedigree `ped`
-#' obtained through `ribd::kinship(ped)`. Once $G$ is simulated, $E$ is assigned
-#' from $N(0,1-h^2)$. Once $P$ is simulated, disease status is defined by the
-#' liability threshold model, where the threhold $t$ is defined such that $\Phi_p$, 
-#' the area under the tail of the standard normal distribution from $t$ is 
-#' the population life-time risk $K$. Note, $K$ is defined by the user. Subsequently,
-#' when for one individual $P > t$ disease status is defined as affected.
-#' 
-#' Equation for heritability sanity check:
-#' 
-#' Limitations to polygenic model:
-#' 
-#' * Shared environment between relatives is not modeled
-#' 
-#' * There is no assortative mating
-#' 
-#' * Heritability is additive, there is no epistasis/dominance
+## General outline of simulation scheme
 
+### Simulating family members:
 
-#' ## R code an functions.
+The pedigree consists of core pedigree (C) with one single founder this
+is initiated by function `init_ped()`.
 
-#' ### Load libraries
+Then offspring generation will be simulated using the `add_gen()`
+function, IDs start with “C” and number reflects order of offspring
+(C0_0 for oldest, C0_1 for second child) in third generation offspring
+of oldest is denoted as C0_0\_\[0-9\] and second C0_1\_\[0-9\] etc.
+etc.. Therefore, all individuals in this lineage IDs can be traced to
+founder. The `add_gen()` function starts with simulating the spouse. The
+number of offspring is samles from a Poisson distribution with mean
+number of offspring $\lambda =$ `lambda`. The spouses married into this
+pedigree are denoted with “P\*” and have same code as partner (P_0_0 for
+partner of firs child in generation 2). The number of generations to be
+added is defined by `k`, so for `k=2` a three-generation pedigree is
+simulated.
+
+When all generations of core pedigree are simulated, we simulate the
+in-laws e.g. the ancestors of the married in spouses (P\*) using the
+`add_inlaws()` function.
+
+To complete the pedigree, we simulate offspring of the inlaws using
+`add_ext_branches()`. These individuals are unlinked to the core
+pedigree, e.g. sibs, cousins, etc. of the spouses married in to this
+pedigree.
+
+### Genetics and phenotypes
+
+#### Mendelian disease alleles
+
+The founder of the core pedigree can be defined to carry a pathogenic
+mutation, when `init_ped(monogenic=TRUE)` is used. For now, this disease
+allele is autosomal, so probability of transmission is 0.5. For spouses
+married into this pedigree, the probability of carrying the disease
+allele is defined by the disease-allele frequency (`DAF`). Note, disease
+alleles introduced by spouses can be transmitted in the core pedigree as
+well. This can be prevented by setting `DAF=0`.
+
+The probability of developing the disease is defined by the
+disease-allele penetrance `penetrance`. Therefore, the disease is
+modeled to be autosomal dominant with or without reduced penetrance.
+
+#### Polygenic model
+
+The general polygenic model is defined by $P = G + E$ where the
+phenotypic value ($P$) is the sum of a genetic value ($G$) and
+non-genetic value ($E$). The phenotypic value $P$ is standardized to
+zero mean and unit variance and thus follows $N(0,1)$. The heritabiliy
+($h^2$), defined as the proportion of phenotypic variance ($V_p$)
+explained by additive genetic variance. The non-genetic component has
+variance $1 - h^2$ by definition.
+
+For a founder $G$ can be drawn from $N(0,h^2)$. For offspring of parents
+$p$ and $m$ with genetic values of $G_p$ and $G_m$ respectively
+$G_{offspring} ~ N(\frac{G_p + G_m}{2},\frac{1}{2}h^2)$ of small
+pedigree G can be simulated using a multivariate normal distribution.
+This requires looping through all offspring which can be slow.
+Alternatively, for simulating a large number of small pedigrees up to
+four generations, G can be simulating from a multivariate normal
+distribution (`MASS::mvrnorm()` or `mvnfast::rmvn()`) where the
+variance-covariance matrix is defined as $2*h^2*\textbf{K}$ where
+$\textbf{K}$ is the kinship matrix of the pedigree `ped` obtained
+through `ribd::kinship(ped)`. Once $G$ is simulated, $E$ is assigned
+from $N(0,1-h^2)$. Once $P$ is simulated, disease status is defined by
+the liability threshold model, where the threhold $t$ is defined such
+that $\Phi_p$, the area under the tail of the standard normal
+distribution from $t$ is the population life-time risk $K$. Note, $K$ is
+defined by the user. Subsequently, when for one individual $P > t$
+disease status is defined as affected.
+
+Equation for heritability sanity check:
+
+Limitations to polygenic model:
+
+- Shared environment between relatives is not modeled
+
+- There is no assortative mating
+
+- Heritability is additive, there is no epistasis/dominance \## R code
+  an functions. \### Load libraries
+
+``` r
 suppressMessages(library(data.table))
 suppressMessages(library(tidyverse))
 suppressMessages(library(MASS))
@@ -90,8 +102,11 @@ suppressMessages(library(mvnfast))
 suppressMessages(library(pedtools))
 suppressMessages(library(ribd))
 suppressMessages(library(RColorBrewer))
+```
 
-#' ### Function to initiate pedigree with one founder with a mutation
+### Function to initiate pedigree with one founder with a mutation
+
+``` r
 init_ped = function(monogenic=TRUE){
   
   core_ped = data.frame(gen = 0, # generation
@@ -107,8 +122,11 @@ init_ped = function(monogenic=TRUE){
   }
   return(core_ped)
 }
+```
 
-#' ### Function to simulate a next generation
+### Function to simulate a next generation
+
+``` r
 add_gen = function(df_ped, lambda, k, DAF){
   g = 0
   while(g < k){
@@ -157,9 +175,13 @@ add_gen = function(df_ped, lambda, k, DAF){
   }
   return(df_ped)
 }
+```
 
-#' ### Function to simulate the "inlaws"
-#' These are the ancestors for those who married into this pedigree
+### Function to simulate the “inlaws”
+
+These are the ancestors for those who married into this pedigree
+
+``` r
 add_inlaws = function(df_ped, DAF){
   adj_ped = filter(df_ped, grepl("P", id))
   g = max(adj_ped$gen)
@@ -195,9 +217,13 @@ add_inlaws = function(df_ped, DAF){
             arrange(., gen)
   return(df_ped)
 }
+```
 
-#' ### Function to simulate all external branches of the pedigree 
-#' These are the branches with individuals unlinked to the core pedigree.
+### Function to simulate all external branches of the pedigree
+
+These are the branches with individuals unlinked to the core pedigree.
+
+``` r
 add_ext_branches = function(df_ped, lambda, k, DAF){
   g = 0
   while(g < k){
@@ -276,8 +302,11 @@ add_ext_branches = function(df_ped, lambda, k, DAF){
   }
   return(df_ped)
 }
+```
 
-#' ### Function to add genetic values for Mendelian and polygenic inheritance
+### Function to add genetic values for Mendelian and polygenic inheritance
+
+``` r
 add_pheno = function(df_ped, penetrance, h2, K){
   
   # Mendelian (autosomal dominant)
@@ -314,10 +343,14 @@ add_pheno = function(df_ped, penetrance, h2, K){
   
   return(df_ped)
 }
+```
 
-#' ### Alternative function to add genetic values for Mendelian and polygenic inheritance
-#' This function samples G from multivariate normal distribution.
-#' This adds genetic values for polygenic inheritance FAST for smaller pedigrees
+### Alternative function to add genetic values for Mendelian and polygenic inheritance
+
+This function samples G from multivariate normal distribution. This adds
+genetic values for polygenic inheritance FAST for smaller pedigrees
+
+``` r
 add_pheno_small = function(df_ped, penetrance, h2, K){
   
   # Mendelian (autosomal dominant)
@@ -350,8 +383,11 @@ add_pheno_small = function(df_ped, penetrance, h2, K){
   
   return(df_ped)
 }
+```
 
-#' wrapper function to simulate full pedigree
+wrapper function to simulate full pedigree
+
+``` r
 sim_ped = function(i=numeric, 
                    k=numeric(), lambda=numeric(), 
                    monogenic=TRUE, DAF=numeric(), penetrance=numeric(), 
@@ -389,10 +425,13 @@ sim_ped = function(i=numeric,
   }
   return(core_ped)
 }
+```
 
+## step-wise simulation with plots
 
-#' ## step-wise simulation with plots 
-#' step 0. Define parameters:
+step 0. Define parameters:
+
+``` r
 # pedigree parameters
 k = 2 # total of 4 generations
 lambda = 2 # mean number of offspring
@@ -402,9 +441,11 @@ penetrance = 0.9 # penetrance
 # polygenic parameters:
 h2 = 0.8 # additive polygenic heritability
 K = 0.05 # life-time risk
+```
 
-#' Step 1. simulate the core pedigree (with monogenic disease)
-#+ step1_core_pedigree
+Step 1. simulate the core pedigree (with monogenic disease)
+
+``` r
 core_ped = init_ped(monogenic=TRUE)
 # run the loop to add generations of offspring
 core_ped = add_gen(core_ped, lambda=lambda, k=k, DAF=DAF)
@@ -416,9 +457,14 @@ ped_plt1 = ped(id = core_ped$id,
 carriers = filter(core_ped, a1 + a2 > 0)$id
 color = "red"
 plot(ped_plt1, title="step 1 - simulated core pedigree", cex=0.8, carrier = carriers, fill=color)
+```
 
-#' step 2. Simulate the inlaws, ancestors of the spouses married into this pedigree
-#+ step2_inlaws
+![](sim_pedigree_files/figure-gfm/step1_core_pedigree-1.png)<!-- -->
+
+step 2. Simulate the inlaws, ancestors of the spouses married into this
+pedigree
+
+``` r
 core_ped = add_inlaws(core_ped, DAF=DAF)
 ped_plt2 = ped(id = core_ped$id,
                fid = core_ped$pid,
@@ -428,9 +474,15 @@ ped_plt2 = ped(id = core_ped$id,
 carriers = filter(core_ped, a1 + a2 > 0)$id
 color = ifelse(ped_plt2$ID %in% ped_plt1$ID, "red", "orange")
 plot(ped_plt2, title="step 2 - simulated the in-laws", cex=0.8, carrier = carriers, fill=color)
+```
 
+![](sim_pedigree_files/figure-gfm/step2_inlaws-1.png)<!-- -->
+
+``` r
 # step 3. Simulate external branches, unlinked to founder
-#+ step3_unlinked
+```
+
+``` r
 core_ped = add_ext_branches(core_ped, lambda=lambda, k=k, DAF=DAF)
 ped_plt3 = ped(id = core_ped$id,
                fid = core_ped$pid,
@@ -440,9 +492,15 @@ ped_plt3 = ped(id = core_ped$id,
 carriers = filter(core_ped, a1 + a2 > 0)$id
 color = ifelse(ped_plt3$ID %in% ped_plt1$ID, "red", ifelse(ped_plt3$ID %in% ped_plt2$ID, "orange", "purple"))
 plot(ped_plt3, title="step 3 - simulated external branches to pedigree", carrier = carriers, fill=color, cex=0.8)
+```
 
+![](sim_pedigree_files/figure-gfm/step3_unlinked-1.png)<!-- -->
+
+``` r
 # step 4. Simulate phenotypes
-#+ step4_pheno
+```
+
+``` r
 core_ped = add_pheno_small(core_ped, penetrance, h2, K)
 carriers = filter(core_ped, a1 + a2 > 0)$id
 affected = filter(core_ped, Y == 1)$id
@@ -452,9 +510,17 @@ pal = colorRampPalette(c("white", "orange", "red"))(1000)
 Pcolors = pal[ceiling(pnorm(core_ped$P)*1000)]
 # make plot
 plot(ped_plt3, title="step 4 - simulated polygenic phenotype on liability scale", carrier = carriers, fill=Pcolors, cex=0.8)
+```
+
+![](sim_pedigree_files/figure-gfm/step4_pheno-1.png)<!-- -->
+
+``` r
 plot(ped_plt3, title="step 4 - colored by binary phenotype", carrier = carriers, aff = affected, cex=0.8)
+```
 
+![](sim_pedigree_files/figure-gfm/step4_pheno-2.png)<!-- -->
 
+``` r
 ## compare theory and simulations for polygenic trait parameters
 # sim_h2 = function(N=100, peds=as.numeric(), k=as.numeric(), lambda=as.numeric(), K=as.numeric(), h2=as.numeric(), small=T){
 #   obs_h2 = rep(NA, N)
@@ -503,12 +569,4 @@ plot(ped_plt3, title="step 4 - colored by binary phenotype", carrier = carriers,
 # t3 = Sys.time()
 # print(t2 - t1)
 # print(t3 - t2)
-
-
-
-
-
-
-
-
-
+```
