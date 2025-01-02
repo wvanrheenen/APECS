@@ -1,4 +1,5 @@
-simPed: as simulation scheme pedigrees with Mendelian and complex traits
+simPed: a simulation scheme for pedigrees with Mendelian and complex
+traits
 ================
 Wouter van Rheenen
 02 January 2025
@@ -66,7 +67,7 @@ This requires looping through all offspring which can be slow.
 Alternatively, for simulating a large number of small pedigrees up to
 four generations, G can be simulating from a multivariate normal
 distribution (`MASS::mvrnorm()` or `mvnfast::rmvn()`) where the
-variance-covariance matrix is defined as $2*h^2*\textbf{K}$ where
+variance-covariance matrix is defined as $2\textbf{K}h^2$ where
 $\textbf{K}$ is the kinship matrix of the pedigree `ped` obtained
 through `ribd::kinship(ped)`. Once $G$ is simulated, $E$ is assigned
 from $N(0,1-h^2)$. Once $P$ is simulated, disease status is defined by
