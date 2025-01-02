@@ -1,11 +1,30 @@
 source("src/libraries_simPed.R")
 source("src/functions_simPed.R")
 
+#' argument parser
+parser = ArgumentParser()
+
+parser$add_argument("-h2", "--heritability", type="numeric", default=0.8,
+                    dest="h2", help="true heritability [default %(default)s]")
+parser$add_argument("-K", "--prevalence", type="numeric", default=0.1,
+                    dest="K", help="Life-time risk [default %(default)s]")
+parser$add_argument("-l", "--lambda", type="numeric", default=2,
+                    dest="lambda", help="average number of offspring [default %(default)s]")
+parser$add_argument("-k", "--generations", type="numeric", default=2,
+                    dest="k", help="offspring generations, total number of generations = k+1 [default %(default)s]")
+parser$add_argument("-N", "--n-sim", type="numeric", default=25,
+                    dest="n_sim", help="number of simulations [default %(default)s]")
+parser$add_argument("-p", "--n-ped", type="numeric", default=1000,
+                    dest="n_ped", help="number of pedigrees per simulation [default %(default)s]")
+parser$add_argument("-o", "--out", type="character", required=TRUE,
+                    dest="out", help="name of the output file [REQUIRED]")
+args = parser$parse_args()
+
+
 #' compare theory and simulations for polygenic trait parameters
-sim_h2 = function(N=100, peds=as.numeric(), k=as.numeric(), lambda=as.numeric(), K=as.numeric(), h2=as.numeric(), small=T){
+sim_h2 = function(N=as.numeric(), peds=as.numeric(), k=as.numeric(), lambda=as.numeric(), K=as.numeric(), h2=as.numeric(), small=F){
   obs_h2 = rep(NA, N)
   for(x in 1:N){
-    cat("POPULATION", x, "\n")
     polygenic_pedigrees = list()
     for(h in 1:peds){
       # cat("simulate pedigree", h, "\n")
@@ -39,76 +58,17 @@ sim_h2 = function(N=100, peds=as.numeric(), k=as.numeric(), lambda=as.numeric(),
     aR = 0.5
     
     obs_h2[x] = (LT - LTr * sqrt(1-(1-LT/i)*(LT^2 - LTr^2))) / (aR*(i + (i-LT) * LTr^2))
+    cat("SAMPLE", x, ":", obs_h2[x], "\n")
   }
   return(obs_h2)
 }
 
-# heritabilities:
-h2s = c(0.2, 0.4, 0.6, 0.8)
+results = sim_h2(N=args$n_sim, peds=args$n_ped, k=args$k, lambda=args$l, K=args$K, h2=args$h2)
 
-# by K
-Ks = c(0.001, 0.005, 0.01, 0.05, 0.1, 0.2)
-sim_by_K = list(expand.grid(h2s, Ks))
-n_sim = 25
-n_param = nrow(sim_by_K[[1]])
-names(sim_by_K[[1]]) <- c("h2", "K")
-sim_by_K[[2]] = list()
-for(i in 1:nrow(sim_by_K[[1]])){
-  cat("simulation", i, "/", nrow(sim_by_K[[1]]), "\n")
-  sim_by_K[[2]][[i]] = sim_h2(N=n_sim, peds=1000, k=2, lambda=2, K=sim_by_K[[1]]$K[i], h2=sim_by_K[[1]]$h2[i], small=T)
-}
-df_plt1 = as.data.frame(matrix(NA, ncol=3, nrow=n_sim*n_param))
-colnames(df_plt1) = c("h2", "k", "sim_h2")
-i = 0
-for(j in 1:n_sim){
-  for(k in 1:n_param){
-    i = i+1 
-    df_plt1[i,] = c(sim_by_K[[1]]$h2[[k]], sim_by_K[[1]]$K[[k]], sim_by_K[[2]][[k]][j])
-  }
-}
-write.table(df_plt1, file="analyses/sim_by_K.txt", col.names=T, row.names=F, quote=F, sep="\t")
-  
-# by lambda
-lambdas = c(1, 1.3, 2, 3)
-sim_by_L = list(expand.grid(h2s, lambdas))
-n_sim = 25
-n_param = nrow(sim_by_L[[1]])
-names(sim_by_L[[1]]) <- c("h2", "L")
-sim_by_L[[2]] = list()
-for(i in 1:nrow(sim_by_L[[1]])){
-  cat("simulation", i, "/", nrow(sim_by_L[[1]]), "\n")
-  sim_by_L[[2]][[i]] = sim_h2(N=n_sim, peds=1000, k=2, lambda=sim_by_L[[1]]$L[i], K=0.1, h2=sim_by_L[[1]]$h2[i], small=T)
-}
-df_plt2 = as.data.frame(matrix(NA, ncol=3, nrow=n_sim*n_param))
-colnames(df_plt2) = c("h2", "k", "sim_h2")
-i = 0
-for(j in 1:n_sim){
-  for(k in 1:n_param){
-    i = i+1 
-    df_plt2[i,] = c(sim_by_L[[1]]$h2[[k]], sim_by_L[[1]]$L[[k]], sim_by_L[[2]][[k]][j])
-  }
-}
-write.table(df_plt2, file="analyses/sim_by_L.txt", col.names=T, row.names=F, quote=F, sep="\t")
+write.table(results, args$out, col.names=F, row.names=F, quote=F, sep="\t")
 
-# by k
-ks = c(1, 2, 3, 4)
-sim_by_k = list(expand.grid(h2s, ks))
-n_sim = 25
-n_param = nrow(sim_by_k[[1]])
-names(sim_by_k[[1]]) <- c("h2", "k")
-sim_by_k[[2]] = list()
-for(i in 1:nrow(sim_by_k[[1]])){
-  cat("simulation", i, "/", nrow(sim_by_k[[1]]), "\n")
-  sim_by_k[[2]][[i]] = sim_h2(N=n_sim, peds=1000, k=sim_by_k[[1]]$k[i], lambda=2, K=0.1, h2=sim_by_k[[1]]$h2[i], small=F)
-}
-df_plt3 = as.data.frame(matrix(NA, ncol=3, nrow=n_sim*n_param))
-colnames(df_plt3) = c("h2", "k", "sim_h2")
-i = 0
-for(j in 1:n_sim){
-  for(k in 1:n_param){
-    i = i+1 
-    df_plt3[i,] = c(sim_by_k[[1]]$h2[[k]], sim_by_k[[1]]$k[[k]], sim_by_k[[2]][[k]][j])
-  }
-}
-write.table(df_plt3, file="analyses/sim_by_k.txt", col.names=T, row.names=F, quote=F, sep="\t")
-
+# # heritabilities:
+# h2s = c(0.2, 0.4, 0.6, 0.8)
+# Ks = c(0.001, 0.005, 0.01, 0.05, 0.1, 0.2)
+# lambdas = c(1, 1.5, 2, 3)
+# ks = c(1, 2, 3, 4)

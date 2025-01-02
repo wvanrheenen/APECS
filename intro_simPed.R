@@ -143,7 +143,7 @@ carriers = filter(core_ped, a1 + a2 > 0)$id
 color = ifelse(ped_plt2$ID %in% ped_plt1$ID, "red", "orange")
 plot(ped_plt2, title="step 2 - simulated the in-laws", cex=0.8, carrier = carriers, fill=color)
 
-# step 3. Simulate external branches, unlinked to founder
+#' step 3. Simulate external branches, unlinked to founder
 #+ step3_unlinked
 core_ped = add_ext_branches(core_ped, lambda=lambda, k=k, DAF=DAF)
 ped_plt3 = ped(id = core_ped$id,
@@ -155,7 +155,7 @@ carriers = filter(core_ped, a1 + a2 > 0)$id
 color = ifelse(ped_plt3$ID %in% ped_plt1$ID, "red", ifelse(ped_plt3$ID %in% ped_plt2$ID, "orange", "purple"))
 plot(ped_plt3, title="step 3 - simulated external branches to pedigree", carrier = carriers, fill=color, cex=0.8)
 
-# step 4. Simulate phenotypes
+#' step 4. Simulate phenotypes
 #+ step4_pheno
 core_ped = add_pheno_small(core_ped, penetrance, h2, K)
 carriers = filter(core_ped, a1 + a2 > 0)$id
