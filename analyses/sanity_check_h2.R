@@ -1,5 +1,7 @@
-source("src/libraries_simPed.R")
-source("src/functions_simPed.R")
+setwd()
+
+source("../src/libraries_simPed.R")
+source("../src/functions_simPed.R")
 
 #' argument parser
 parser = ArgumentParser()
@@ -14,7 +16,7 @@ parser$add_argument("-k", "--generations", type="numeric", default=2,
                     dest="k", help="offspring generations, total number of generations = k+1 [default %(default)s]")
 parser$add_argument("-N", "--n-sim", type="numeric", default=25,
                     dest="n_sim", help="number of simulations [default %(default)s]")
-parser$add_argument("-p", "--n-ped", type="numeric", default=1000,
+parser$add_argument("-p", "--n-ped", type="numeric", default=5000,
                     dest="n_ped", help="number of pedigrees per simulation [default %(default)s]")
 parser$add_argument("-o", "--out", type="character", required=TRUE,
                     dest="out", help="name of the output file [REQUIRED]")
