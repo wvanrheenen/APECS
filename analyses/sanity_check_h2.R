@@ -65,7 +65,10 @@ sim_h2 = function(N=as.numeric(), peds=as.numeric(), k=as.numeric(), lambda=as.n
 
 results = sim_h2(N=args$n_sim, peds=args$n_ped, k=args$k, lambda=args$l, K=args$K, h2=args$h2)
 
-write.table(results, args$out, col.names=F, row.names=F, quote=F, sep="\t")
+output = data.frame(h2=args$h2, K=args$K, lambda=args$l, k=args$k, N=args$n_sim, peds=args$n_ped,
+                    h2sim = results)
+
+write.table(results, args$out, col.names=T, row.names=F, quote=F, sep="\t")
 
 # # heritabilities:
 # h2s = c(0.2, 0.4, 0.6, 0.8)
