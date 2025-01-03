@@ -1,7 +1,12 @@
-setwd()
+#' loading libraries and functions for src folder seems a bit complicated. However, makes sure the script can be run from any location as long as the file/directory structure is maintained as in the github repository.
+#' Could be improved...
 
-source("../src/libraries_simPed.R")
-source("../src/functions_simPed.R")
+#' Get the script's path using commandArgs
+script_path = normalizePath(sub("--file=", "", commandArgs(trailingOnly = FALSE)[grep("--file=", commandArgs(trailingOnly = FALSE))]))
+script_dir  = dirname(script_path)
+#' load libraries and functions
+source(file.path(script_dir, "/../src/libraries_simPed.R"))
+source(file.path(script_dir, "/../src/functions_simPed.R"))
 
 #' argument parser
 parser = ArgumentParser()
@@ -70,10 +75,4 @@ results = sim_h2(N=args$n_sim, peds=args$n_ped, k=args$k, lambda=args$l, K=args$
 output = data.frame(h2=args$h2, K=args$K, lambda=args$l, k=args$k, N=args$n_sim, peds=args$n_ped,
                     h2sim = results)
 
-write.table(results, args$out, col.names=T, row.names=F, quote=F, sep="\t")
-
-# # heritabilities:
-# h2s = c(0.2, 0.4, 0.6, 0.8)
-# Ks = c(0.001, 0.005, 0.01, 0.05, 0.1, 0.2)
-# lambdas = c(1, 1.5, 2, 3)
-# ks = c(1, 2, 3, 4)
+write.table(output, args$out, col.names=T, row.names=F, quote=F, sep="\t")
