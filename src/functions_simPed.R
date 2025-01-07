@@ -1,10 +1,14 @@
 #' ## To do's
 #TODO: recode lambda to vector with length of k to vary over generations
+#TODO: solve over-estimation of pedigree size,
 #TODO: calculate penetrance per pedigree and check if this works
 #TODO: Pleiotropy and genetic correlation: extend to two correlated traits
 
+#' make sure warnings are treated as errors
+options( warn = 2 )
+
 #' ### Function to initiate pedigree with one founder with a mutation
-init_ped = function(monogenic=TRUE){
+init_ped = function(monogenic=TRUE, k=numeric(), yob_index=2025, gen_yr=25){
   
   core_ped = data.frame(gen = 0, # generation
                         id = "C0", # individual id - founder
@@ -12,16 +16,20 @@ init_ped = function(monogenic=TRUE){
                         mid = as.character(NA), # maternal id
                         sex = 1, # sex, 0 = male, 1 = female
                         a1 = 0) # first allele at disease locus
+  # determine whether founder carries the disease allele
   if(monogenic){
     core_ped$a2 = 1 # disease allele at second allele at disease locus
   }else{
     core_ped$a2 = 0 # second allele at disease locus   
   }
+  # get the birth year of the founder:
+  core_ped$yob = yob_index - k * gen_yr
+  
   return(core_ped)
 }
 
 #' ### Function to simulate a next generation
-add_gen = function(df_ped, lambda, k, DAF){
+add_gen = function(df_ped, lambda=NA, k=numeric(), DAF=numeric(), gen_yr=25, fert_rate=data.frame()){
   g = 0
   while(g < k){
     # select individuals from youngest generation
@@ -32,17 +40,26 @@ add_gen = function(df_ped, lambda, k, DAF){
       for(i in 1:nrow(I1s)){
         # simulate partner (I2 for parent 2)
         I2 = data.frame(gen = g, 
-                        id = gsub("C", "P", I1s$id[i]),
+                        id  = gsub("C", "P", I1s$id[i]),
                         pid = NA, # at this point parents are irrelevant, will be simulated in later step
                         mid = NA, # at this point parents are irrelevant, will be simulated in later step
                         sex = abs(I1s$sex[i] - 1), # opposite sex partners only...
-                        a1 = sample(c(0,1), 1, prob=c(1-DAF, DAF)), # sample disease allele from population frequency
-                        a2 = sample(c(0,1), 1, prob=c(1-DAF, DAF))) # sample disease allele from population frequency
-        # simulate number of offspring from Poisson distribution with mean lambda (as defined by general pedigree parameters)
-        n_II = rpois(1,lambda)
+                        a1  = sample(c(0,1), 1, prob=c(1-DAF, DAF)), # sample disease allele from population frequency
+                        a2  = sample(c(0,1), 1, prob=c(1-DAF, DAF)), # sample disease allele from population frequency
+                        yob = I1s$yob[i])
+        # simulate number of offspring from Poisson distribution with mean lambda (as defined by general pedigree parameters, or obtained from fertility rate and birthyear)
+        if(is.na(lambda)){
+          n_II = rpois(1, fert_rate[fert_rate$year == I1s$yob[i], "mean_fertility"])
+        } else { 
+          n_II = rpois(1, lambda)
+        }
         # make sure generation 0 gets offspring
         while(n_II == 0 & g == 0){
-          n_II = rpois(1,lambda)
+          if(is.na(lambda)){
+            n_II = rpois(1, fert_rate[fert_rate$year == I1s$yob[i], "mean_fertility"])
+          } else { 
+            n_II = rpois(1, lambda)
+          }
         }
         # create data_frame for offspring:
         IIs = as.data.frame(matrix(NA, nrow=n_II, ncol=ncol(df_ped)))
@@ -57,14 +74,17 @@ add_gen = function(df_ped, lambda, k, DAF){
           IIs$sex[j] = sample(c(0,1), 1)
           IIs$a1[j]  = sample(c(I1s$a1[i], I1s$a2[i]), 1)
           IIs$a2[j]  = sample(c(I2$a1, I2$a2), 1)
+          IIs$yob[j] = I1s$yob[i] + gen_yr
         }
         if(n_II > 0){
           df_ped = bind_rows(df_ped, I2, IIs)
+        } else {
+          df_ped = bind_rows(df_ped, I2)
         }
       }
       g = g+1
     } else {
-      g = g-1
+      g = g-1 # go back one generation and re-simulate to make sure there is any offspring, this will over-estimate pedigree size...
     }
   }
   return(df_ped)
@@ -72,7 +92,7 @@ add_gen = function(df_ped, lambda, k, DAF){
 
 #' ### Function to simulate the "inlaws"
 #' These are the ancestors for those who married into this pedigree
-add_inlaws = function(df_ped, DAF){
+add_inlaws = function(df_ped, DAF, gen_yr=25){
   adj_ped = filter(df_ped, grepl("P", id))
   g = max(adj_ped$gen)
   while(! g == 0){
@@ -80,12 +100,13 @@ add_inlaws = function(df_ped, DAF){
     for(i in 1:nrow(IIs)){
       # simulate parents 1 (I1)
       I1 = data.frame(gen = g-1, 
-                      id = paste0(IIs$id[i], "_m"), # "_m" suffix for mother
+                      id  = paste0(IIs$id[i], "_m"), # "_m" suffix for mother
                       pid = NA, 
                       mid = NA, 
                       sex = 1, # mother
-                      a1 = ifelse(IIs$a1[i] == 1, 1, 0), # assume mother always transmits a1 for coding convenience
-                      a2 = sample(c(0,1), 1, prob=c(1-DAF, DAF))) # non-transmitted allele sampled from population
+                      a1  = ifelse(IIs$a1[i] == 1, 1, 0), # assume mother always transmits a1 for coding convenience
+                      a2  = sample(c(0,1), 1, prob=c(1-DAF, DAF)), # non-transmitted allele sampled from population
+                      yob = IIs$yob[i] - gen_yr) # define year of birth
       # simulate father
       I2 = data.frame(gen = g-1, 
                       id = paste0(IIs$id[i], "_p"), # "_p" suffix for father
@@ -93,7 +114,8 @@ add_inlaws = function(df_ped, DAF){
                       mid = NA, 
                       sex = 0,
                       a1 = ifelse(IIs$a2[i] == 1, 1, 0), # assume father always transmits a2 for coding convenience
-                      a2 = sample(c(0,1), 1, prob=c(1-DAF, DAF))) # non-transmitted allele sampled from population
+                      a2 = sample(c(0,1), 1, prob=c(1-DAF, DAF)), # non-transmitted allele sampled from population
+                      yob = IIs$yob[i] - gen_yr) # define year of birth
       # add parents to pedigree
       adj_ped = bind_rows(adj_ped, I1, I2)
       # update parental ID in ped
@@ -110,7 +132,7 @@ add_inlaws = function(df_ped, DAF){
 
 #' ### Function to simulate all external branches of the pedigree 
 #' These are the branches with individuals unlinked to the core pedigree.
-add_ext_branches = function(df_ped, lambda, k, DAF){
+add_ext_branches = function(df_ped, lambda=NA, k=numeric(), DAF=numeric(), gen_yr=25, fert_rate=data.frame()){
   g = 0
   while(g < k){
     # First, for pairs already in df_ped then select only mothers from the parental generation # sex is irrelevant in this simulation
@@ -125,8 +147,17 @@ add_ext_branches = function(df_ped, lambda, k, DAF){
         # find father that is already in pedigree
         I2_id = gsub("_m$", "_p", I1s$id[i])
         I2 = filter(df_ped, id == I2_id)
-        # simulate number of offspring from Poisson distribution with mean lambda
-        n_II = rpois(1, lambda) - 1 # minus 1 because one child has already been simulated in first round
+        if(! nrow(I2 == 1)){
+          print(I2)
+          print(I2_id)
+          stop("Non-unique IDs found!!")
+        }
+        # simulate number of offspring from Poisson distribution with mean lambda (as defined by general pedigree parameters, or obtained from fertility rate and birthyear)
+        if(is.na(lambda)){
+          n_II = rpois(1, fert_rate[fert_rate$year == I1s$yob[i], "mean_fertility"]) - 1 # minus 1 because one child has already been simulated in first round
+        } else { 
+          n_II = rpois(1, lambda) - 1 # minus 1 because one child has already been simulated in first round
+        }
         # simulate offspring simulate to add_gen() function
         if(n_II > 0){
           IIs = as.data.frame(matrix(NA, nrow=n_II, ncol=ncol(df_ped)))
@@ -136,18 +167,19 @@ add_ext_branches = function(df_ped, lambda, k, DAF){
             j = j+1
             IIs$gen[j] = g + 1
             IIs$id[j]  = paste(I1s$id[i], j, sep="_")
-            IIs$pid[j] = I2$id
+            IIs$pid[j] = I2_id
             IIs$mid[j] = I1s$id[i]
             IIs$sex[j] = sample(c(0,1), 1)
             IIs$a1[j]  = sample(c(I1s$a1[i], I1s$a2[i]), 1) # a1 is always from mother - here, I1
             IIs$a2[j]  = sample(c(I2$a1, I2$a2), 1)
+            IIs$yob[j] = I1s$yob[i] + gen_yr
           }
           df_ped = bind_rows(df_ped, IIs)
         }
       }
     }
     
-    # Second, find NF who don't have a partner yet (offspring simulated in previous loop)
+    # Second, find NF who don't have a partner yet (the offspring simulated in previous loop)
     # these have IDs ending with a digit, but do have either "p" or "m" in their IDs
     I1s = filter(df_ped, gen == g & 
                    (grepl("p", id) | grepl("m", id)) &
@@ -161,10 +193,15 @@ add_ext_branches = function(df_ped, lambda, k, DAF){
                         pid = NA, 
                         mid = NA, 
                         sex = abs(I1s$sex[i] - 1),
-                        a1 = sample(c(0,1), 1, prob=c(1-DAF, DAF)),
-                        a2 = sample(c(0,1), 1, prob=c(1-DAF, DAF)))
-        # simulate number of offspring from Poisson distribution with mean 2
-        n_II = rpois(1,lambda)
+                        a1  = sample(c(0,1), 1, prob=c(1-DAF, DAF)),
+                        a2  = sample(c(0,1), 1, prob=c(1-DAF, DAF)),
+                        yob = I1s$yob[i])
+        # simulate number of offspring from Poisson distribution with mean lambda (as defined by general pedigree parameters, or obtained from fertility rate and birthyear)
+        if(is.na(lambda)){
+          n_II = rpois(1, fert_rate[fert_rate$year == I1s$yob[i], "mean_fertility"])
+        } else { 
+          n_II = rpois(1, lambda)
+        }
         # create data_frame for offspring:
         IIs = as.data.frame(matrix(NA, nrow=n_II, ncol=ncol(df_ped)))
         colnames(IIs) = colnames(df_ped)
@@ -178,9 +215,12 @@ add_ext_branches = function(df_ped, lambda, k, DAF){
           IIs$sex[j] = sample(c(0,1), 1)
           IIs$a1[j]  = sample(c(I1s$a1[i], I1s$a2[i]), 1)
           IIs$a2[j]  = sample(c(I2$a1, I2$a2), 1)
+          IIs$yob[j] = I1s$yob[i] + gen_yr
         }
         if(n_II > 0){
           df_ped = bind_rows(df_ped, I2, IIs)
+        } else {
+          df_ped = bind_rows(df_ped, I2)
         }
       }
     }
@@ -265,15 +305,16 @@ add_pheno_small = function(df_ped, penetrance, h2, K){
 
 #' wrapper function to simulate full pedigree
 sim_ped = function(i=numeric, 
-                   k=numeric(), lambda=numeric(), 
+                   k=numeric(), lambda=NA, 
+                   yob_index=2025, gen_yr=25, fert_rate=data.frame(),
                    monogenic=TRUE, DAF=numeric(), penetrance=numeric(), 
                    K=numeric(), h2=numeric(),
                    small=TRUE,
                    plot=TRUE){
-  core_ped = init_ped(monogenic=monogenic)
-  core_ped = add_gen(core_ped, lambda=lambda, k=k, DAF=DAF)
-  core_ped = add_inlaws(core_ped, DAF=DAF)
-  core_ped = add_ext_branches(core_ped, lambda=lambda, k=k, DAF=DAF)
+  core_ped = init_ped(monogenic=monogenic, k=k, yob_index=yob_index, gen_yr=gen_yr)
+  core_ped = add_gen(core_ped, lambda=lambda, k=k, DAF=DAF, gen_yr=gen_yr, fert_rate=fert_rate)
+  core_ped = add_inlaws(core_ped, DAF=DAF, gen_yr=gen_yr)
+  core_ped = add_ext_branches(core_ped, lambda=lambda, k=k, DAF=DAF, gen_yr=gen_yr, fert_rate=fert_rate)
   if(small) {
     core_ped = add_pheno_small(core_ped, penetrance, h2, K) # traditional ALTERNATIVE
   } else {

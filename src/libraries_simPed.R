@@ -1,5 +1,6 @@
 suppressMessages(library(argparse))
 suppressMessages(library(data.table))
+suppressMessages(library(R.utils))
 suppressMessages(library(tidyverse))
 suppressMessages(library(MASS))
 suppressMessages(library(mvnfast))
