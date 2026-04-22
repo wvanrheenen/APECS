@@ -1,0 +1,48 @@
+import math
+
+## snakemake -s snakefile --executor slurm --jobs 500 --default-resources mem_mb=5000 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 4 --slurm-keep-successful-logs all -n
+
+configfile: "config.yaml"
+
+n_total = config["n_total"]
+chunk_size = config["chunk_size"]
+n_chunks = math.ceil(n_total / chunk_size)
+
+print(f"Config loaded: n_total={config['n_total']}, chunk_size={config['chunk_size']}")
+
+rule all:
+    input:
+        "results/population_metrics.rds"
+
+rule install_packages:
+    output:
+        touch("logs/packages_installed.txt")
+    script:
+        "scripts/install_packages.R"
+
+rule simulate_chunk:
+    input:
+        packages = "logs/packages_installed.txt"        
+    output:
+        "results/sim_chunks/sim_chunk_{chunk}.rds"
+    params:
+        chunk_size=config["chunk_size"],
+        currentyear = 2200
+    shell:
+        """
+        Rscript scripts/simulate_chunk.R {wildcards.chunk} {params.chunk_size} {params.currentyear} {output}
+        """
+
+rule combine_and_analyze:
+    input:
+        expand("results/sim_chunks/sim_chunk_{chunk}.rds", chunk=range(1, n_chunks+1))
+    output:
+        lifetime_risk = "results/population_metrics.rds",
+        binned_risk = "results/lifetime_risk5year_bins.csv"
+    params:
+        start_year = 2015,
+        end_year = 2019
+    resources:
+        mem_mb=100000            
+    script:
+        "scripts/combine_and_analyze.R"

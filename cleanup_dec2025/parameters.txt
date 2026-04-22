@@ -1,0 +1,27 @@
+
+# Parameters for simulation as run for ENCALS 
+script_path <- this.path()
+script_dir <- this.dir()
+monogenic_prob = 0.0
+k = 2 # total of 3 generations
+lambda = NA # mean number of offspring
+fert_rate = read.table(file.path(script_dir, "/data/fertility_rate/Gapminder/GM_fertility_rate_Netherlands_1800_2100.txt"), header=T)
+mean_gen_yr = 30
+life_expectancy = read.table(file.path(script_dir, "/data/life_expectancy_at_fifteen/OWID_life_expectancy_Netherlands_1835_2085.txt"), header=T)
+current_year = 2025
+DAF_common = 0.0011 # Disease allele frequency, lower than reported in Van Wijk 2024
+DAF_patho = 0.00015
+DAF_ftd = 0.0003
+penetrance_ALS_common = read.table(file.path(script_dir, "/data/lifetime_disease_risk/lifetime_ALS_c9_risk.txt" ), header=T) # derived from Van Wijk 2024
+penetrance_ALS_patho = read.table(file.path(script_dir, "/data/lifetime_disease_risk/lifetime_ALS_c9_risk.txt" ), header=T) # derived from Van Wijk 2024
+h2_ALS = 0.5 # additive polygenic heritability
+K_ALS = 0.003 # life-time risk, 1/350
+penetrance_FTD_common = read.table(file.path(script_dir, "/data/lifetime_disease_risk/lifetime_ALS_c9_risk.txt" ), header=T) # derived from Van Wijk 2024 
+penetrance_FTD_patho = read.table(file.path(script_dir, "/data/lifetime_disease_risk/lifetime_ALS_c9_risk.txt" ), header=T) # derived from Van Wijk 2024
+penetrance_FTD_nonALS = read.table(file.path(script_dir, "/data/lifetime_disease_risk/lifetime_ALS_c9_risk.txt" ), header=T) # derived from Van Wijk 2024
+h2_FTD = 0.375 # additive polygenic heritability
+K_FTD = 0.0013 # life-time risk 1/750
+K_dementia = read.table(file.path(script_dir, "/data/lifetime_disease_risk/lifetime_dementia_risk.txt" ), header=T) # derived from Fang 2025 
+h2_dementia = 0.4 # heritabiliy is 0.5 for AD according to Gatz 2006; lowered to compensate for prevalence of e.g. vascular dementia
+rg = 0.8
+plot = FALSE # Do not plot pedigree

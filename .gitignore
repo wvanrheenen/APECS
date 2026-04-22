@@ -1,0 +1,16 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.snakemake
+results
+old
+building_pred*
+logs
+results*
+progeny*
+varying_parameters*
+rationale*
+ALPINE*
+data*
+predic*

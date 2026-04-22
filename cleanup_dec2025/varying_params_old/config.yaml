@@ -1,0 +1,13 @@
+baseline:
+  mendelian_modifier: 12
+  fertility_rate_modifier: 2
+  life_expectancy_modifier: 70
+  penetrance_ALS_modifier: 0.247
+  penetrance_FTD_modifier: 0.2
+
+mendelian_percentages: [5, 10, 15, 20, 25, 30]
+fertility_rate_modifiers: [1, 2, 4, 6]
+life_expectancy_modifiers: [40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+year_of_birth_modifiers: [1920, 1950, 1980, 2010]
+penetrance_ALS_modifiers: [0.01, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 0.99]
+penetrance_FTD_modifiers: [0.01, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 0.99]
