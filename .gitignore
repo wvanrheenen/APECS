@@ -5,7 +5,9 @@
 .Rhistory
 .RData
 .Ruserdata
+.DS_store
 .snakemake
+.gitignore
 
 # Directories not to upload
 heritability_contribution

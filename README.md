@@ -21,8 +21,29 @@ This is a list of the subdirectories in our main github page:
   - This directory contains a pipeline needed to run analyses on cryptic distant relatives in monogenic index patient pedigrees.
 
 ## Setup
-For parallelization of simulation, we require installation of snakemake
+### Snakefile
+**Snakemake** + **SLURM executor plugin** required for HPC execution.
 
+#### Installation (Conda - Recommended)
+```bash
+# Install snakemake + SLURM executor plugin
+conda create -n snakemake -c conda-forge -c bioconda snakemake snakemake-executor-plugin-slurm
+conda activate snakemake
+```
+
+#### Run Pipeline (Login Node Only)
+```bash
+conda activate snakemake
+
+# This commnand can be applied for all snakefiles in this github; change the -s {snakefile_name} to the correct name where necessary for parallelization
+snakemake -s snakefile --executor slurm --jobs 500 \
+  --default-resources mem_mb=1000 runtime=900 constraint="avx2" \
+  --rerun-incomplete --keep-going --latency-wait 90 --cores 1 \
+  --slurm-keep-successful-logs all
+```
+
+
+### R Packages
 This is a list of required R packages:
 - argparse: command line argument parsing
 - data.table: fast data manipulation
