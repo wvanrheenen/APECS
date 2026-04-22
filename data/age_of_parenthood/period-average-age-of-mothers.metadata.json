@@ -1,0 +1,40 @@
+{
+  "chart": {
+    "title": "Average age of mothers at childbirth",
+    "subtitle": "Estimated average age of women who have given birth in each year. This includes all births that year, not just women's first childbirth.",
+    "citation": "Human Fertility Database (2024); UN, World Population Prospects (2024)",
+    "originalChartUrl": "https://ourworldindata.org/grapher/period-average-age-of-mothers?tab=chart&country=SWE~NLD~Europe+%28UN%29&v=1&csvType=filtered&useColumnShortNames=false",
+    "selection": [
+      "United States",
+      "Thailand",
+      "France",
+      "South Africa",
+      "India",
+      "China",
+      "Brazil"
+    ]
+  },
+  "columns": {
+    "Mean age at childbearing, historical": {
+      "titleShort": "Mean age at childbearing",
+      "titleLong": "Mean age at childbearing",
+      "descriptionShort": "Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year.",
+      "descriptionProcessing": "This indicator is constructed by combining data from multiple sources:\n\n- Before 1950: Historical estimates by Human Fertility Database (2024).\n\n- 1950-2023: Population records by the UN World Population Prospects (2024 revision).",
+      "unit": "years",
+      "timespan": "1891-2023",
+      "type": "Numeric",
+      "owidVariableId": 1004413,
+      "shortName": "mean_age_childbearing_hist",
+      "lastUpdated": "2024-12-18",
+      "nextUpdate": "2025-12-18",
+      "citationShort": "Human Fertility Database (2024); UN, World Population Prospects (2024) – processed by Our World in Data",
+      "citationLong": "Human Fertility Database (2024); UN, World Population Prospects (2024) – processed by Our World in Data. “Mean age at childbearing” [dataset]. Human Fertility Database, “Human Fertility Database”; United Nations, “World Population Prospects” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/1004413.metadata.json"
+    }
+  },
+  "dateDownloaded": "2025-02-04",
+  "activeFilters": {
+    "country": "SWE~NLD~Europe (UN)",
+    "tab": "chart"
+  }
+}

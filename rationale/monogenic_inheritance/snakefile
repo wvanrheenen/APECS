@@ -1,0 +1,61 @@
+# Snakefile
+# command: snakemake -s snakefile --executor slurm --jobs 50 --default-resources mem_mb=5000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 4 --slurm-keep-successful-logs all
+
+PENETRANCE = ["0.2", "0.5", "0.8"]
+LAMBDA = ["1.5", "3"] 
+GENS = ["3"]
+REPS = range(1,6)  
+N_PEDS = 2500
+
+rule all:
+    input:
+        "monogenic_prob.pdf"  # Final target: the plot
+
+rule simulate_monogenic:
+    output:
+        tsv="results/sim_{pen}_lam{lam}_gens{gens}_rep{reps}.tsv"
+    input:
+        rscript = "monogenic_inheritance.R"
+    params:
+        pen="{pen}",
+        lam="{lam}", 
+        gens="{gens}",
+        peds=N_PEDS,
+        singlerep=1,  
+        reps="{reps}", 
+    resources:
+        mem_mb=lambda wildcards: 10000 if (
+            wildcards.gens == "3"
+        ) else 2500,
+        runtime=900
+    shell:
+        """
+        mkdir -p results
+        Rscript {input.rscript} {params.pen} {params.lam} {params.gens} {params.peds} {params.singlerep} {params.reps} {output.tsv}
+        """
+
+rule combine_simulations:
+    input:
+        expand("results/sim_{pen}_lam{lam}_gens{gens}_rep{reps}.tsv",
+               pen=PENETRANCE, lam=LAMBDA, gens=GENS, reps=REPS)
+    output:
+        "monogenic_inheritance.tsv"
+    shell:
+        """
+        mkdir -p results
+        head -n 1 {input[0]} > {output}  # Copy header from first file
+        tail -n +2 -q {input} >> {output}  # Append data rows from all files
+        """
+
+rule plot_monogenic:
+    input:
+        "monogenic_inheritance.tsv"
+    output:
+        "monogenic_prob.pdf"
+    resources:
+        mem_mb=4000,
+        runtime=300
+    shell:
+        """
+        Rscript monogenic_plot.R
+        """        

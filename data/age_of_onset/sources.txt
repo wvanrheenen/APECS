@@ -1,0 +1,19 @@
+Polygenic ALS
+Nona RJ, et al. Age of Onset and Length of Survival of Queensland Patients with Amyotrophic Lateral Sclerosis: Details of Subjects with Early Onset and Subjects with Long Survival. Neurodegener Dis. 2022;22(3-4):104-121. doi: 10.1159/000528875. Epub 2022 Dec 30. PMID: 36587610; PMCID: PMC10627495.
+
+Polygenic FTD
+Incidence of Syndromes Associated With Frontotemporal Lobar Degeneration in 9 European Countries. Giancarlo Logroscino, JAMA 2023
+Age-related incidence and family history in frontotemporal dementia: data from the Swedish dementia registry. Christer Nilsson 2014.
+
+Polygenic dementia
+Fang 2025 
+
+c9 ALS
+Murphy NA, Arthur KC, Tienari PJ, Houlden H, Chiò A, Traynor BJ. Age-related penetrance of the C9orf72 repeat expansion. Sci Rep. 2017 May 18;7(1):2116. doi: 10.1038/s41598-017-02364-1. PMID: 28522837; PMCID: PMC5437033.
+
+c9 FTD
+Murphy NA, Arthur KC, Tienari PJ, Houlden H, Chiò A, Traynor BJ. Age-related penetrance of the C9orf72 repeat expansion. Sci Rep. 2017 May 18;7(1):2116. doi: 10.1038/s41598-017-02364-1. PMID: 28522837; PMCID: PMC5437033.
+check: Moore KM, et al; FTD Prevention Initiative. Age at symptom onset and death and disease duration in genetic frontotemporal dementia: an international retrospective cohort study. Lancet Neurol. 2020 Feb;19(2):145-156. doi: 10.1016/S1474-4422(19)30394-1. Epub 2019 Dec 3. Erratum in: Lancet Neurol. 2020 Feb;19(2):e2. doi: 10.1016/S1474-4422(19)30483-1. PMID: 31810826; PMCID: PMC7007771.
+
+c9 dementia
+Gao 2025 (study jan)

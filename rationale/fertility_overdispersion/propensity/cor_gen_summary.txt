@@ -1,0 +1,3 @@
+parent_gen	child_gen	n_pairs	cor
+0	1	258	
+1	2	568	

@@ -1,0 +1,724 @@
+
+--- Model 1st degree relatives with ALS ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 4146.302 
+Nagelkerke R-squared: 0.258 
+AIC: 4150.302 
+
+--- Classification Metrics ---
+Sensitivity: 0.435 
+Specificity: 0.955 
+PPV: 0.668 
+NPV: 0.891 
+Accuracy: 0.866 
+AUC: 0.697 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       413        205        | PPV: 0.67
+polygen      537        4386       | NPV: 0.89
+             Sens: 0.43 Spec: 0.96
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                  Coefficient Odds_Ratio OR_2.5_CI OR_97.5_CI       P_value
+(Intercept)         -2.083330  0.1245149 0.1139606  0.1360466  0.000000e+00
+relatives_1st_als    2.417825 11.2214218 9.3447759 13.4749415 7.618603e-148
+
+-----------------------------------------
+
+--- Model 1st or 2nd degree relatives with ALS ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 3499.191 
+Nagelkerke R-squared: 0.413 
+AIC: 3505.191 
+
+--- Classification Metrics ---
+Sensitivity: 0.318 
+Specificity: 0.99 
+PPV: 0.868 
+NPV: 0.875 
+Accuracy: 0.875 
+AUC: 0.803 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       302        46         | PPV: 0.87
+polygen      648        4545       | NPV: 0.88
+             Sens: 0.32 Spec: 0.99
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                  Coefficient Odds_Ratio  OR_2.5_CI  OR_97.5_CI       P_value
+(Intercept)         -2.516006 0.08078163 0.07251453  0.08999123  0.000000e+00
+relatives_1st_als    2.197167 8.99947748 7.34279343 11.02994326  1.908225e-99
+relatives_2nd_als    2.261379 9.59630990 7.87336847 11.69628528 4.162264e-111
+
+-----------------------------------------
+
+--- Model 1st, 2nd, or 3rd degree relatives with ALS ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 3382.901 
+Nagelkerke R-squared: 0.439 
+AIC: 3390.901 
+
+--- Classification Metrics ---
+Sensitivity: 0.402 
+Specificity: 0.984 
+PPV: 0.84 
+NPV: 0.888 
+Accuracy: 0.884 
+AUC: 0.826 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       382        73         | PPV: 0.84
+polygen      568        4518       | NPV: 0.89
+             Sens: 0.4  Spec: 0.98
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                  Coefficient Odds_Ratio  OR_2.5_CI  OR_97.5_CI      P_value
+(Intercept)         -2.628566 0.07218191 0.06444541  0.08084717 0.000000e+00
+relatives_1st_als    2.157528 8.64972978 7.04277509 10.62334440 4.568927e-94
+relatives_2nd_als    2.143009 8.52504865 6.95970675 10.44245930 3.172257e-95
+relatives_3rd_als    1.162655 3.19841293 2.55740557  4.00008721 2.228864e-24
+
+-----------------------------------------
+
+--- Model 1st, 2nd, or 3rd degree relatives with ALS ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 3382.901 
+Nagelkerke R-squared: 0.439 
+AIC: 3390.901 
+
+--- Classification Metrics ---
+Sensitivity: 0.402 
+Specificity: 0.984 
+PPV: 0.84 
+NPV: 0.888 
+Accuracy: 0.884 
+AUC: 0.826 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       382        73         | PPV: 0.84
+polygen      568        4518       | NPV: 0.89
+             Sens: 0.4  Spec: 0.98
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                  Coefficient Odds_Ratio  OR_2.5_CI  OR_97.5_CI      P_value
+(Intercept)         -2.628566 0.07218191 0.06444541  0.08084717 0.000000e+00
+relatives_1st_als    2.157528 8.64972978 7.04277509 10.62334440 4.568927e-94
+relatives_2nd_als    2.143009 8.52504865 6.95970675 10.44245930 3.172257e-95
+relatives_3rd_als    1.162655 3.19841293 2.55740557  4.00008721 2.228864e-24
+
+-----------------------------------------
+
+--- Model 1st, 2nd, or 3rd degree relatives with ALS or FTD ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 2953.321 
+Nagelkerke R-squared: 0.531 
+AIC: 2967.321 
+
+--- Classification Metrics ---
+Sensitivity: 0.569 
+Specificity: 0.974 
+PPV: 0.821 
+NPV: 0.916 
+Accuracy: 0.905 
+AUC: 0.874 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       541        118        | PPV: 0.82
+polygen      409        4473       | NPV: 0.92
+             Sens: 0.57 Spec: 0.97
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                         Coefficient  Odds_Ratio  OR_2.5_CI  OR_97.5_CI
+(Intercept)               -2.9281976  0.05349337  0.0470322  0.06084214
+relatives_1st_als          2.1588606  8.66126303  6.9703096 10.76243112
+relatives_2nd_als          2.0296078  7.61110052  6.1320009  9.44697372
+relatives_3rd_als          0.9619893  2.61689709  2.0547959  3.33276422
+relatives_1st_ftd_unique   3.2285581 25.24323178 15.8847340 40.11529253
+relatives_2nd_ftd_unique   2.1005083  8.17032168  5.5689638 11.98681822
+relatives_3rd_ftd_unique   1.2024721  3.32833485  1.9771627  5.60288386
+                              P_value
+(Intercept)              0.000000e+00
+relatives_1st_als        1.580604e-84
+relatives_2nd_als        1.103897e-75
+relatives_3rd_als        6.322002e-15
+relatives_1st_ftd_unique 1.725328e-42
+relatives_2nd_ftd_unique 6.537231e-27
+relatives_3rd_ftd_unique 6.029510e-06
+
+-----------------------------------------
+
+--- Model 1st, 2nd, or 3rd degree relatives with ALS or dementia ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 2997.301 
+Nagelkerke R-squared: 0.522 
+AIC: 3011.301 
+
+--- Classification Metrics ---
+Sensitivity: 0.533 
+Specificity: 0.972 
+PPV: 0.797 
+NPV: 0.909 
+Accuracy: 0.897 
+AUC: 0.892 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       506        129        | PPV: 0.8
+polygen      444        4462       | NPV: 0.91
+             Sens: 0.53 Spec: 0.97
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                              Coefficient Odds_Ratio  OR_2.5_CI  OR_97.5_CI
+(Intercept)                    -3.2437159 0.03901864 0.03351374  0.04542776
+relatives_1st_als               2.2875998 9.85126423 7.90279651 12.28013486
+relatives_2nd_als               2.0376144 7.67228408 6.18756089  9.51327091
+relatives_3rd_als               1.0807916 2.94701156 2.31923726  3.74471265
+relatives_1st_dementia_unique   1.6756201 5.34210653 4.35479791  6.55325524
+relatives_2nd_dementia_unique   0.7873760 2.19762223 1.90524487  2.53486759
+relatives_3rd_dementia_unique  -0.2166811 0.80518668 0.65020697  0.99710648
+                                   P_value
+(Intercept)                   0.000000e+00
+relatives_1st_als             5.140624e-92
+relatives_2nd_als             5.712942e-77
+relatives_3rd_als             9.324460e-19
+relatives_1st_dementia_unique 3.998937e-58
+relatives_2nd_dementia_unique 3.095527e-27
+relatives_3rd_dementia_unique 4.697044e-02
+
+-----------------------------------------
+Area under the curve: 0.8738
+Area under the curve: 0.8918
+
+--- Model looking at 1st, 2nd, or 3rd degree ALS-affected and unaffected relatives ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 3320.989 
+Nagelkerke R-squared: 0.453 
+AIC: 3334.989 
+
+--- Classification Metrics ---
+Sensitivity: 0.436 
+Specificity: 0.979 
+PPV: 0.813 
+NPV: 0.893 
+Accuracy: 0.886 
+AUC: 0.854 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       414        95         | PPV: 0.81
+polygen      536        4496       | NPV: 0.89
+             Sens: 0.44 Spec: 0.98
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                         Coefficient Odds_Ratio OR_2.5_CI OR_97.5_CI
+(Intercept)              -1.55185196  0.2118553 0.1436137  0.3125234
+relatives_1st_als         2.14628585  8.5530321 6.9469841 10.5303766
+relatives_2nd_als         2.12209413  8.3486023 6.7985915 10.2519999
+relatives_3rd_als         1.34758050  3.8481038 3.0353291  4.8785163
+relatives_1st_unaffected -0.08053858  0.9226193 0.8873625  0.9592769
+relatives_2nd_unaffected -0.04588751  0.9551494 0.9065641  1.0063385
+relatives_3rd_unaffected -0.01406149  0.9860369 0.9710367  1.0012689
+                              P_value
+(Intercept)              5.133295e-15
+relatives_1st_als        5.695373e-91
+relatives_2nd_als        3.419259e-91
+relatives_3rd_als        8.734701e-29
+relatives_1st_unaffected 5.090904e-05
+relatives_2nd_unaffected 8.492837e-02
+relatives_3rd_unaffected 7.219784e-02
+
+-----------------------------------------
+
+--- Model looking at 1st, 2nd, or 3rd degree ALS or FTD-affected and unaffected relatives ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 2859.293 
+Nagelkerke R-squared: 0.55 
+AIC: 2879.293 
+
+--- Classification Metrics ---
+Sensitivity: 0.552 
+Specificity: 0.977 
+PPV: 0.833 
+NPV: 0.913 
+Accuracy: 0.904 
+AUC: 0.899 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       524        105        | PPV: 0.83
+polygen      426        4486       | NPV: 0.91
+             Sens: 0.55 Spec: 0.98
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                                Coefficient Odds_Ratio  OR_2.5_CI OR_97.5_CI
+(Intercept)                     -1.42370647  0.2408198  0.1576274  0.3679192
+relatives_1st_als                2.13848049  8.4865325  6.8109384 10.5743481
+relatives_2nd_als                1.99320522  7.3390192  5.8894220  9.1454141
+relatives_3rd_als                1.17964492  3.2532189  2.5060839  4.2230961
+relatives_1st_ftd_unique         3.23818432 25.4874029 15.8881598 40.8862770
+relatives_2nd_ftd_unique         2.09183624  8.0997746  5.5020334 11.9240186
+relatives_3rd_ftd_unique         1.46018706  4.3067651  2.5266960  7.3409010
+relatives_1st_ALSFTD_unaffected -0.12071899  0.8862830  0.8484495  0.9258035
+relatives_2nd_ALSFTD_unaffected -0.07127031  0.9312101  0.8785624  0.9870128
+relatives_3rd_ALSFTD_unaffected -0.01511945  0.9849943  0.9683649  1.0019092
+                                     P_value
+(Intercept)                     4.574517e-11
+relatives_1st_als               5.836601e-81
+relatives_2nd_als               1.610040e-70
+relatives_3rd_als               7.913645e-19
+relatives_1st_ftd_unique        4.070370e-41
+relatives_2nd_ftd_unique        2.915981e-26
+relatives_3rd_ftd_unique        8.015509e-08
+relatives_1st_ALSFTD_unaffected 5.840476e-08
+relatives_2nd_ALSFTD_unaffected 1.638385e-02
+relatives_3rd_ALSFTD_unaffected 8.178186e-02
+
+-----------------------------------------
+
+--- Model looking at 1st, 2nd, or 3rd degree ALS or dementia-affected and unaffected relatives ---
+
+--- Model Fit ---
+Null deviance: 5077.514 
+Residual deviance: 2876.431 
+Nagelkerke R-squared: 0.546 
+AIC: 2896.431 
+
+--- Classification Metrics ---
+Sensitivity: 0.542 
+Specificity: 0.975 
+PPV: 0.815 
+NPV: 0.911 
+Accuracy: 0.9 
+AUC: 0.907 
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+             mendel     polygen   
+mendel       515        117        | PPV: 0.81
+polygen      435        4474       | NPV: 0.91
+             Sens: 0.54 Spec: 0.97
+
+
+--- Coefficients, Odds Ratios, 95% CI, and P-values ---
+                                Coefficient Odds_Ratio OR_2.5_CI OR_97.5_CI
+(Intercept)                     -1.60883815  0.2001200 0.1312832  0.3050505
+relatives_1st_als                2.27535152  9.7313391 7.7803867 12.1714980
+relatives_2nd_als                2.00013917  7.3900845 5.9324671  9.2058410
+relatives_3rd_als                1.29444826  3.6489821 2.8151368  4.7298130
+relatives_1st_dementia_unique    1.66067763  5.2628759 4.2778177  6.4747646
+relatives_2nd_dementia_unique    0.85362934  2.3481537 2.0112594  2.7414791
+relatives_3rd_dementia_unique    0.02726131  1.0276363 0.8172805  1.2921346
+relatives_1st_ALSdem_unaffected -0.12529396  0.8822375 0.8449920  0.9211247
+relatives_2nd_ALSdem_unaffected -0.08616525  0.9174426 0.8658609  0.9720972
+relatives_3rd_ALSdem_unaffected -0.01906188  0.9811186 0.9646061  0.9979139
+                                     P_value
+(Intercept)                     7.425393e-14
+relatives_1st_als               2.149149e-88
+relatives_2nd_als               3.227638e-71
+relatives_3rd_als               1.381499e-22
+relatives_1st_dementia_unique   1.365366e-55
+relatives_2nd_dementia_unique   3.314584e-27
+relatives_3rd_dementia_unique   8.155336e-01
+relatives_1st_ALSdem_unaffected 1.245956e-08
+relatives_2nd_ALSdem_unaffected 3.516680e-03
+relatives_3rd_ALSdem_unaffected 2.772589e-02
+
+-----------------------------------------
+ROC plots saved as 4x4 PDFs with Darjeeling1 Wes Anderson palette
+ROC plots saved as one combined PDF with Darjeeling1 Wes Anderson palette
+
+==============================
+Model: ALS model including unaffected individuals 
+==============================
+
+
+Model Fit Statistics:
+Null Deviance: 5077.514
+Residual Deviance: 3320.989
+Nagelkerke R-squared: 0.453
+
+AIC: 3334.989
+
+Performance Metrics (threshold = 0.5 ):
+Sensitivity: 0.436
+Specificity: 0.979
+PPV: 0.812
+NPV: 0.893
+Accuracy: 0.886
+AUC: 0.852
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+            Mendelian Polygenic 
+Mendelian   414       96         | PPV: 0.812
+Polygenic   536       4495       | NPV: 0.893
+             Sens: 0.436 Spec: 0.979
+
+Model Coefficients:
+                     Term    Estimate        OR  CI_lower   CI_upper
+              (Intercept) -1.55185196 0.2118553 0.1436137  0.3125234
+        relatives_1st_als  2.14628585 8.5530321 6.9469841 10.5303766
+        relatives_2nd_als  2.12209413 8.3486023 6.7985915 10.2519999
+        relatives_3rd_als  1.34758050 3.8481038 3.0353291  4.8785163
+ relatives_1st_unaffected -0.08053858 0.9226193 0.8873625  0.9592769
+ relatives_2nd_unaffected -0.04588751 0.9551494 0.9065641  1.0063385
+ relatives_3rd_unaffected -0.01406149 0.9860369 0.9710367  1.0012689
+      p_value
+ 5.133295e-15
+ 5.695373e-91
+ 3.419259e-91
+ 8.734701e-29
+ 5.090904e-05
+ 8.492837e-02
+ 7.219784e-02
+
+==============================
+Model: ALS + FTD model including unaffected individuals 
+==============================
+
+
+Model Fit Statistics:
+Null Deviance: 5077.514
+Residual Deviance: 2859.293
+Nagelkerke R-squared: 0.550
+
+AIC: 2879.293
+
+Performance Metrics (threshold = 0.5 ):
+Sensitivity: 0.551
+Specificity: 0.977
+PPV: 0.833
+NPV: 0.913
+Accuracy: 0.904
+AUC: 0.897
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+            Mendelian Polygenic 
+Mendelian   523       105        | PPV: 0.833
+Polygenic   427       4486       | NPV: 0.913
+             Sens: 0.551 Spec: 0.977
+
+Model Coefficients:
+                            Term    Estimate         OR   CI_lower   CI_upper
+                     (Intercept) -1.42370647  0.2408198  0.1576274  0.3679192
+               relatives_1st_als  2.13848049  8.4865325  6.8109384 10.5743481
+               relatives_2nd_als  1.99320522  7.3390192  5.8894220  9.1454141
+               relatives_3rd_als  1.17964492  3.2532189  2.5060839  4.2230961
+        relatives_1st_ftd_unique  3.23818432 25.4874029 15.8881598 40.8862770
+        relatives_2nd_ftd_unique  2.09183624  8.0997746  5.5020334 11.9240186
+        relatives_3rd_ftd_unique  1.46018706  4.3067651  2.5266960  7.3409010
+ relatives_1st_ALSFTD_unaffected -0.12071899  0.8862830  0.8484495  0.9258035
+ relatives_2nd_ALSFTD_unaffected -0.07127031  0.9312101  0.8785624  0.9870128
+ relatives_3rd_ALSFTD_unaffected -0.01511945  0.9849943  0.9683649  1.0019092
+      p_value
+ 4.574517e-11
+ 5.836601e-81
+ 1.610040e-70
+ 7.913645e-19
+ 4.070370e-41
+ 2.915981e-26
+ 8.015509e-08
+ 5.840476e-08
+ 1.638385e-02
+ 8.178186e-02
+
+==============================
+Model: ALS + Dementia model including unaffected individuals 
+==============================
+
+
+Model Fit Statistics:
+Null Deviance: 5077.514
+Residual Deviance: 2876.431
+Nagelkerke R-squared: 0.546
+
+AIC: 2896.431
+
+Performance Metrics (threshold = 0.5 ):
+Sensitivity: 0.539
+Specificity: 0.974
+PPV: 0.811
+NPV: 0.911
+Accuracy: 0.899
+AUC: 0.906
+
+--- Confusion Matrix (Predicted as rows, Actual as columns) ---
+            Mendelian Polygenic 
+Mendelian   512       119        | PPV: 0.811
+Polygenic   438       4472       | NPV: 0.911
+             Sens: 0.539 Spec: 0.974
+
+Model Coefficients:
+                            Term    Estimate        OR  CI_lower   CI_upper
+                     (Intercept) -1.60883815 0.2001200 0.1312832  0.3050505
+               relatives_1st_als  2.27535152 9.7313391 7.7803867 12.1714980
+               relatives_2nd_als  2.00013917 7.3900845 5.9324671  9.2058410
+               relatives_3rd_als  1.29444826 3.6489821 2.8151368  4.7298130
+   relatives_1st_dementia_unique  1.66067763 5.2628759 4.2778177  6.4747646
+   relatives_2nd_dementia_unique  0.85362934 2.3481537 2.0112594  2.7414791
+   relatives_3rd_dementia_unique  0.02726131 1.0276363 0.8172805  1.2921346
+ relatives_1st_ALSdem_unaffected -0.12529396 0.8822375 0.8449920  0.9211247
+ relatives_2nd_ALSdem_unaffected -0.08616525 0.9174426 0.8658609  0.9720972
+ relatives_3rd_ALSdem_unaffected -0.01906188 0.9811186 0.9646061  0.9979139
+      p_value
+ 7.425393e-14
+ 2.149149e-88
+ 3.227638e-71
+ 1.381499e-22
+ 1.365366e-55
+ 3.314584e-27
+ 8.155336e-01
+ 1.245956e-08
+ 3.516680e-03
+ 2.772589e-02
+                                          model threshold  accuracy sensitivity
+1           ALS-affected + unaffected relatives     0.100 0.8045807       0.748
+2           ALS-affected + unaffected relatives     0.125 0.8505726       0.708
+3           ALS-affected + unaffected relatives     0.150 0.8561138       0.701
+4           ALS-affected + unaffected relatives     0.175 0.8596232       0.692
+5           ALS-affected + unaffected relatives     0.200 0.8644256       0.688
+6           ALS-affected + unaffected relatives     0.225 0.8670115       0.681
+7           ALS-affected + unaffected relatives     0.250 0.8729221       0.673
+8           ALS-affected + unaffected relatives     0.275 0.8760621       0.662
+9           ALS-affected + unaffected relatives     0.300 0.8797562       0.652
+10          ALS-affected + unaffected relatives     0.325 0.8825268       0.631
+11          ALS-affected + unaffected relatives     0.350 0.8847433       0.603
+12          ALS-affected + unaffected relatives     0.375 0.8882527       0.579
+13          ALS-affected + unaffected relatives     0.400 0.8919468       0.561
+14          ALS-affected + unaffected relatives     0.425 0.8906539       0.520
+15          ALS-affected + unaffected relatives     0.450 0.8897303       0.483
+16          ALS-affected + unaffected relatives     0.475 0.8904692       0.456
+17          ALS-affected + unaffected relatives     0.500 0.8871444       0.419
+18          ALS-affected + unaffected relatives     0.525 0.8865903       0.408
+19          ALS-affected + unaffected relatives     0.550 0.8873291       0.404
+20          ALS-affected + unaffected relatives     0.575 0.8869597       0.397
+21          ALS-affected + unaffected relatives     0.600 0.8867750       0.394
+22          ALS-affected + unaffected relatives     0.625 0.8865903       0.390
+23          ALS-affected + unaffected relatives     0.650 0.8856668       0.383
+24          ALS-affected + unaffected relatives     0.675 0.8852974       0.380
+25          ALS-affected + unaffected relatives     0.700 0.8851127       0.373
+26          ALS-affected + unaffected relatives     0.725 0.8847433       0.363
+27          ALS-affected + unaffected relatives     0.750 0.8830809       0.351
+28          ALS-affected + unaffected relatives     0.775 0.8825268       0.343
+29          ALS-affected + unaffected relatives     0.800 0.8806797       0.330
+30          ALS-affected + unaffected relatives     0.825 0.8801256       0.318
+31          ALS-affected + unaffected relatives     0.850 0.8766162       0.291
+32      ALS/FTD-affected + unaffected relatives     0.100 0.8429996       0.795
+33      ALS/FTD-affected + unaffected relatives     0.125 0.8664573       0.777
+34      ALS/FTD-affected + unaffected relatives     0.150 0.8718138       0.772
+35      ALS/FTD-affected + unaffected relatives     0.175 0.8777244       0.762
+36      ALS/FTD-affected + unaffected relatives     0.200 0.8827115       0.752
+37      ALS/FTD-affected + unaffected relatives     0.225 0.8873291       0.733
+38      ALS/FTD-affected + unaffected relatives     0.250 0.8904692       0.712
+39      ALS/FTD-affected + unaffected relatives     0.275 0.8936092       0.691
+40      ALS/FTD-affected + unaffected relatives     0.300 0.8998892       0.681
+41      ALS/FTD-affected + unaffected relatives     0.325 0.9022904       0.662
+42      ALS/FTD-affected + unaffected relatives     0.350 0.9022904       0.636
+43      ALS/FTD-affected + unaffected relatives     0.375 0.9022904       0.609
+44      ALS/FTD-affected + unaffected relatives     0.400 0.9024751       0.588
+45      ALS/FTD-affected + unaffected relatives     0.425 0.9022904       0.566
+46      ALS/FTD-affected + unaffected relatives     0.450 0.9028445       0.550
+47      ALS/FTD-affected + unaffected relatives     0.475 0.9028445       0.536
+48      ALS/FTD-affected + unaffected relatives     0.500 0.9033986       0.529
+49      ALS/FTD-affected + unaffected relatives     0.525 0.9035833       0.523
+50      ALS/FTD-affected + unaffected relatives     0.550 0.9033986       0.519
+51      ALS/FTD-affected + unaffected relatives     0.575 0.9026598       0.510
+52      ALS/FTD-affected + unaffected relatives     0.600 0.9019209       0.500
+53      ALS/FTD-affected + unaffected relatives     0.625 0.9008127       0.486
+54      ALS/FTD-affected + unaffected relatives     0.650 0.8995198       0.476
+55      ALS/FTD-affected + unaffected relatives     0.675 0.8982268       0.465
+56      ALS/FTD-affected + unaffected relatives     0.700 0.8978574       0.455
+57      ALS/FTD-affected + unaffected relatives     0.725 0.8965645       0.444
+58      ALS/FTD-affected + unaffected relatives     0.750 0.8956409       0.436
+59      ALS/FTD-affected + unaffected relatives     0.775 0.8928703       0.412
+60      ALS/FTD-affected + unaffected relatives     0.800 0.8893609       0.387
+61      ALS/FTD-affected + unaffected relatives     0.825 0.8858515       0.358
+62      ALS/FTD-affected + unaffected relatives     0.850 0.8840044       0.339
+63 ALS/Dementia-affected + unaffected relatives     0.100 0.7958995       0.859
+64 ALS/Dementia-affected + unaffected relatives     0.125 0.8228666       0.840
+65 ALS/Dementia-affected + unaffected relatives     0.150 0.8417067       0.820
+66 ALS/Dementia-affected + unaffected relatives     0.175 0.8570373       0.804
+67 ALS/Dementia-affected + unaffected relatives     0.200 0.8688585       0.783
+68 ALS/Dementia-affected + unaffected relatives     0.225 0.8810491       0.773
+69 ALS/Dementia-affected + unaffected relatives     0.250 0.8891762       0.756
+70 ALS/Dementia-affected + unaffected relatives     0.275 0.8936092       0.733
+71 ALS/Dementia-affected + unaffected relatives     0.300 0.8945327       0.699
+72 ALS/Dementia-affected + unaffected relatives     0.325 0.8960103       0.673
+73 ALS/Dementia-affected + unaffected relatives     0.350 0.8984115       0.658
+74 ALS/Dementia-affected + unaffected relatives     0.375 0.9000739       0.636
+75 ALS/Dementia-affected + unaffected relatives     0.400 0.9021057       0.618
+76 ALS/Dementia-affected + unaffected relatives     0.425 0.9022904       0.598
+77 ALS/Dementia-affected + unaffected relatives     0.450 0.9030292       0.592
+78 ALS/Dementia-affected + unaffected relatives     0.475 0.9033986       0.582
+79 ALS/Dementia-affected + unaffected relatives     0.500 0.9041374       0.571
+80 ALS/Dementia-affected + unaffected relatives     0.525 0.9043221       0.557
+81 ALS/Dementia-affected + unaffected relatives     0.550 0.9028445       0.541
+82 ALS/Dementia-affected + unaffected relatives     0.575 0.9024751       0.531
+83 ALS/Dementia-affected + unaffected relatives     0.600 0.9026598       0.523
+84 ALS/Dementia-affected + unaffected relatives     0.625 0.9022904       0.509
+85 ALS/Dementia-affected + unaffected relatives     0.650 0.9022904       0.499
+86 ALS/Dementia-affected + unaffected relatives     0.675 0.9022904       0.488
+87 ALS/Dementia-affected + unaffected relatives     0.700 0.8998892       0.466
+88 ALS/Dementia-affected + unaffected relatives     0.725 0.8978574       0.449
+89 ALS/Dementia-affected + unaffected relatives     0.750 0.8961950       0.432
+90 ALS/Dementia-affected + unaffected relatives     0.775 0.8921315       0.404
+91 ALS/Dementia-affected + unaffected relatives     0.800 0.8895456       0.383
+92 ALS/Dementia-affected + unaffected relatives     0.825 0.8864056       0.358
+93 ALS/Dementia-affected + unaffected relatives     0.850 0.8834503       0.331
+   specificity   ppv       npv   auc auprc    F1 youdens_j
+1    0.8158829 0.450 0.9416283 0.852 0.686 0.562     0.564
+2    0.8793256 0.541 0.9373374 0.852 0.686 0.613     0.587
+3    0.8873114 0.556 0.9365488 0.852 0.686 0.620     0.588
+4    0.8933008 0.566 0.9352067 0.852 0.686 0.623     0.585
+5    0.8999556 0.580 0.9347926 0.852 0.686 0.629     0.588
+6    0.9043922 0.589 0.9338067 0.852 0.686 0.632     0.585
+7    0.9130435 0.609 0.9329102 0.852 0.686 0.639     0.586
+8    0.9190328 0.622 0.9312205 0.852 0.686 0.641     0.581
+9    0.9254658 0.638 0.9297972 0.852 0.686 0.645     0.577
+10   0.9330080 0.654 0.9264317 0.852 0.686 0.642     0.564
+11   0.9414374 0.674 0.9218071 0.852 0.686 0.637     0.544
+12   0.9503106 0.701 0.9183280 0.852 0.686 0.634     0.529
+13   0.9585182 0.731 0.9156601 0.852 0.686 0.635     0.520
+14   0.9651730 0.750 0.9091099 0.852 0.686 0.614     0.485
+15   0.9713842 0.772 0.9034454 0.852 0.686 0.594     0.454
+16   0.9778172 0.805 0.8994083 0.852 0.686 0.582     0.434
+17   0.9811446 0.817 0.8937159 0.852 0.686 0.554     0.400
+18   0.9826974 0.826 0.8920660 0.852 0.686 0.546     0.391
+19   0.9844720 0.839 0.8915227 0.852 0.686 0.545     0.388
+20   0.9853594 0.845 0.8905373 0.852 0.686 0.540     0.382
+21   0.9858030 0.848 0.8900461 0.852 0.686 0.538     0.380
+22   0.9864685 0.853 0.8894000 0.852 0.686 0.535     0.376
+23   0.9866903 0.853 0.8883563 0.852 0.686 0.529     0.370
+24   0.9869122 0.854 0.8878467 0.852 0.686 0.526     0.367
+25   0.9880213 0.862 0.8868977 0.852 0.686 0.521     0.361
+26   0.9895741 0.875 0.8854704 0.852 0.686 0.513     0.353
+27   0.9900177 0.876 0.8835874 0.852 0.686 0.501     0.341
+28   0.9909051 0.884 0.8824575 0.852 0.686 0.494     0.334
+29   0.9913487 0.885 0.8804177 0.852 0.686 0.481     0.321
+30   0.9931233 0.903 0.8787046 0.852 0.686 0.470     0.311
+31   0.9942325 0.910 0.8747073 0.852 0.686 0.441     0.285
+32   0.8527063 0.520 0.9538462 0.889 0.731 0.629     0.648
+33   0.8844277 0.575 0.9517785 0.889 0.731 0.661     0.661
+34   0.8919698 0.589 0.9510407 0.889 0.731 0.668     0.664
+35   0.9010648 0.607 0.9495091 0.889 0.731 0.676     0.663
+36   0.9090506 0.624 0.9479528 0.889 0.731 0.682     0.661
+37   0.9183673 0.643 0.9447741 0.889 0.731 0.685     0.651
+38   0.9263531 0.660 0.9411765 0.889 0.731 0.685     0.638
+39   0.9343390 0.679 0.9376670 0.889 0.731 0.685     0.625
+40   0.9438776 0.709 0.9363996 0.889 0.731 0.695     0.625
+41   0.9505324 0.729 0.9333479 0.889 0.731 0.694     0.613
+42   0.9558563 0.743 0.9288640 0.889 0.731 0.685     0.592
+43   0.9611801 0.759 0.9244719 0.889 0.731 0.676     0.570
+44   0.9656167 0.775 0.9210749 0.889 0.731 0.669     0.554
+45   0.9698314 0.790 0.9175236 0.889 0.731 0.659     0.536
+46   0.9738243 0.808 0.9149646 0.889 0.731 0.654     0.524
+47   0.9764862 0.821 0.9128992 0.889 0.731 0.649     0.512
+48   0.9787045 0.833 0.9117586 0.889 0.731 0.647     0.508
+49   0.9800355 0.840 0.9109278 0.889 0.731 0.645     0.503
+50   0.9807010 0.844 0.9102327 0.889 0.731 0.643     0.500
+51   0.9815883 0.848 0.9088108 0.889 0.731 0.637     0.492
+52   0.9826974 0.853 0.9072292 0.889 0.731 0.630     0.483
+53   0.9842502 0.861 0.9049561 0.889 0.731 0.621     0.470
+54   0.9846939 0.862 0.9033374 0.889 0.731 0.613     0.461
+55   0.9853594 0.864 0.9015628 0.889 0.731 0.605     0.450
+56   0.9869122 0.875 0.9000607 0.889 0.731 0.599     0.442
+57   0.9875776 0.878 0.8983051 0.889 0.731 0.590     0.432
+58   0.9880213 0.880 0.8970796 0.889 0.731 0.583     0.424
+59   0.9895741 0.888 0.8932719 0.889 0.731 0.563     0.402
+60   0.9902396 0.889 0.8894202 0.889 0.731 0.539     0.377
+61   0.9920142 0.900 0.8848437 0.889 0.731 0.512     0.350
+62   0.9935670 0.914 0.8820402 0.889 0.731 0.495     0.333
+63   0.7832742 0.443 0.9650178 0.902 0.753 0.585     0.642
+64   0.8194321 0.483 0.9622297 0.902 0.753 0.613     0.659
+65   0.8460515 0.517 0.9590143 0.902 0.753 0.634     0.666
+66   0.8677906 0.550 0.9564792 0.902 0.753 0.653     0.672
+67   0.8862023 0.580 0.9530057 0.902 0.753 0.666     0.669
+68   0.9028394 0.615 0.9518241 0.902 0.753 0.685     0.676
+69   0.9159272 0.644 0.9491954 0.902 0.753 0.696     0.672
+70   0.9259095 0.665 0.9451993 0.902 0.753 0.697     0.659
+71   0.9338953 0.680 0.9391033 0.902 0.753 0.689     0.633
+72   0.9407720 0.696 0.9347587 0.902 0.753 0.684     0.614
+73   0.9467613 0.713 0.9322848 0.902 0.753 0.684     0.605
+74   0.9531943 0.732 0.9286795 0.902 0.753 0.681     0.589
+75   0.9591837 0.753 0.9259101 0.902 0.753 0.679     0.577
+76   0.9633984 0.767 0.9226684 0.902 0.753 0.672     0.561
+77   0.9656167 0.776 0.9216600 0.902 0.753 0.672     0.558
+78   0.9680568 0.785 0.9200928 0.902 0.753 0.668     0.550
+79   0.9711624 0.799 0.9183973 0.902 0.753 0.666     0.542
+80   0.9740461 0.812 0.9163189 0.902 0.753 0.661     0.531
+81   0.9755989 0.817 0.9135854 0.902 0.753 0.651     0.517
+82   0.9771517 0.824 0.9120083 0.902 0.753 0.646     0.508
+83   0.9789264 0.833 0.9108359 0.902 0.753 0.643     0.502
+84   0.9813665 0.846 0.9086055 0.902 0.753 0.636     0.490
+85   0.9833629 0.858 0.9071005 0.902 0.753 0.631     0.482
+86   0.9855812 0.872 0.9054412 0.902 0.753 0.626     0.474
+87   0.9871340 0.879 0.9019051 0.902 0.753 0.609     0.453
+88   0.9880213 0.883 0.8992530 0.902 0.753 0.595     0.437
+89   0.9895741 0.893 0.8965032 0.902 0.753 0.582     0.422
+90   0.9902396 0.893 0.8920863 0.902 0.753 0.556     0.394
+91   0.9913487 0.899 0.8888226 0.902 0.753 0.537     0.374
+92   0.9926797 0.908 0.8849120 0.902 0.753 0.514     0.351
+93   0.9944543 0.923 0.8809196 0.902 0.753 0.487     0.325
+[1] "Best f1 statistic values:"
+# A tibble: 3 × 11
+# Groups:   model [3]
+  model threshold accuracy sensitivity specificity   ppv   npv   auc auprc    F1
+  <chr>     <dbl>    <dbl>       <dbl>       <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+1 ALS-…     0.3      0.880       0.652       0.925 0.638 0.930 0.852 0.686 0.645
+2 ALS/…     0.3      0.900       0.681       0.944 0.709 0.936 0.889 0.731 0.695
+3 ALS/…     0.275    0.894       0.733       0.926 0.665 0.945 0.902 0.753 0.697
+# ℹ 1 more variable: youdens_j <dbl>
+[1] "Best AUPRC values:"
+# A tibble: 93 × 11
+# Groups:   model [3]
+   model      threshold accuracy sensitivity specificity   ppv   npv   auc auprc
+   <chr>          <dbl>    <dbl>       <dbl>       <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 ALS-affec…     0.1      0.805       0.748       0.816 0.45  0.942 0.852 0.686
+ 2 ALS-affec…     0.125    0.851       0.708       0.879 0.541 0.937 0.852 0.686
+ 3 ALS-affec…     0.15     0.856       0.701       0.887 0.556 0.937 0.852 0.686
+ 4 ALS-affec…     0.175    0.860       0.692       0.893 0.566 0.935 0.852 0.686
+ 5 ALS-affec…     0.2      0.864       0.688       0.900 0.58  0.935 0.852 0.686
+ 6 ALS-affec…     0.225    0.867       0.681       0.904 0.589 0.934 0.852 0.686
+ 7 ALS-affec…     0.25     0.873       0.673       0.913 0.609 0.933 0.852 0.686
+ 8 ALS-affec…     0.275    0.876       0.662       0.919 0.622 0.931 0.852 0.686
+ 9 ALS-affec…     0.3      0.880       0.652       0.925 0.638 0.930 0.852 0.686
+10 ALS-affec…     0.325    0.883       0.631       0.933 0.654 0.926 0.852 0.686
+# ℹ 83 more rows
+# ℹ 2 more variables: F1 <dbl>, youdens_j <dbl>
+[1] "Best youdens values:"
+# A tibble: 4 × 11
+# Groups:   model [3]
+  model threshold accuracy sensitivity specificity   ppv   npv   auc auprc    F1
+  <chr>     <dbl>    <dbl>       <dbl>       <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+1 ALS-…     0.15     0.856       0.701       0.887 0.556 0.937 0.852 0.686 0.62 
+2 ALS-…     0.2      0.864       0.688       0.900 0.58  0.935 0.852 0.686 0.629
+3 ALS/…     0.15     0.872       0.772       0.892 0.589 0.951 0.889 0.731 0.668
+4 ALS/…     0.225    0.881       0.773       0.903 0.615 0.952 0.902 0.753 0.685
+# ℹ 1 more variable: youdens_j <dbl>

@@ -1,0 +1,61 @@
+# Snakefile
+# command: snakemake -s snakefile_lifeexp --executor slurm --jobs 400 --default-resources mem_mb=1000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 1 --slurm-keep-successful-logs all
+
+# Define the number of simulations and how many to run per job
+TOTAL_SIMULATIONS = 1000000
+SIMULATIONS_PER_JOB = 2500
+
+SETS = ["full_lifespan_params"]
+
+rule all:
+    input:
+        expand("results/{set}/combined_simulations.csv", set=SETS),
+        expand("results/{set}/combined_metrics.csv", set=SETS),
+        expand("results/{set}/prediction_model.csv", set=SETS),
+        expand("results/{set}/disease_onset_plots", set=SETS)        
+
+rule install_packages:
+    output:
+        touch("logs/packages_installed.txt")
+    script:
+        "../../src/install_packages.R"
+
+rule run_simulation:
+    input:
+        packages = "logs/packages_installed.txt"
+    output:
+        results = "results/{set}/simulations/simulation_{chunk}.csv",
+        metrics = "results/{set}/metrics/metrics_{chunk}.csv",
+    threads: 2,
+    params:
+        set = lambda wildcards: wildcards.set  
+    resources:
+        mem_mb= 1000
+    shell:
+        "Rscript simulation_lifeexp.R {params.set} {wildcards.chunk} {SIMULATIONS_PER_JOB}"
+   
+rule combine_results:
+    input:
+        results = expand("results/{set}/simulations/simulation_{chunk}.csv", set=lambda wildcards: wildcards.set, chunk=range(0, TOTAL_SIMULATIONS, SIMULATIONS_PER_JOB)),
+        metrics = expand("results/{set}/metrics/metrics_{chunk}.csv", set=lambda wildcards: wildcards.set, chunk=range(0, TOTAL_SIMULATIONS, SIMULATIONS_PER_JOB)),
+    output:
+        combined_results = "results/{set}/combined_simulations.csv",
+        combined_metrics = "results/{set}/combined_metrics.csv",
+        prediction_model = "results/{set}/prediction_model.csv",
+    params:
+        set = lambda wildcards: wildcards.set
+    script:
+        "combine_results.R"
+
+rule disease_onset_analysis:
+    input:
+        simulations = "results/{set}/combined_simulations.csv",
+        onset_data = "../../data/age_of_onset/age_of_onset.csv"
+    output:
+        directory("results/{set}/disease_onset_plots")
+    params:
+        set = lambda wildcards: wildcards.set
+    shell:
+        """
+        Rscript disease_onset.R {input.simulations} {input.onset_data} {params.set} {output[0]}
+        """

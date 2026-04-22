@@ -1,0 +1,51 @@
+# Snakefile
+# command: snakemake -s snakefile --executor slurm --jobs 500 --default-resources mem_mb=2500 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 2 --slurm-keep-successful-logs all
+
+# Define the number of simulations and how many to run per job
+TOTAL_SIMULATIONS = 50000
+SIMULATIONS_PER_JOB = 100
+
+SETS = ["alpine"]
+
+rule all:
+    input:
+        expand("results/{set}/combined_simulations.csv", set=SETS),
+        expand("results/{set}/combined_metrics.csv", set=SETS),
+        expand("results/{set}/prediction_model.csv", set=SETS)
+
+rule install_packages:
+    output:
+        touch("logs/packages_installed.txt")
+    script:
+        "src/install_packages.R"
+
+rule run_simulation:
+    input:
+        packages = "logs/packages_installed.txt"
+    output:
+        results = "results/{set}/simulations/simulation_{chunk}.csv",
+        metrics = "results/{set}/metrics/metrics_{chunk}.csv",
+    threads: 4,
+    params:
+        set = lambda wildcards: wildcards.set  
+    resources:
+        runtime = 86400,
+        mem_mb=lambda wildcards: 5000 if (
+            wildcards.set == "alpine"
+        ) else 2500,
+    shell:
+        "Rscript simulation.R {params.set} {wildcards.chunk} {SIMULATIONS_PER_JOB}"
+   
+rule combine_results:
+    input:
+        results = expand("results/{set}/simulations/simulation_{chunk}.csv", set=lambda wildcards: wildcards.set, chunk=range(0, TOTAL_SIMULATIONS, SIMULATIONS_PER_JOB)),
+        metrics = expand("results/{set}/metrics/metrics_{chunk}.csv", set=lambda wildcards: wildcards.set, chunk=range(0, TOTAL_SIMULATIONS, SIMULATIONS_PER_JOB)),
+    output:
+        combined_results = "results/{set}/combined_simulations.csv",
+        combined_results_ALPINE = "results/{set}/combined_simulations_ALPINE.csv",
+        combined_metrics = "results/{set}/combined_metrics.csv",
+        prediction_model = "results/{set}/prediction_model.csv",
+    params:
+        set = lambda wildcards: wildcards.set
+    script:
+        "src/combine_results.R"

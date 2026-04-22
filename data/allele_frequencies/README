@@ -1,0 +1,7 @@
+For reference, see Douglas 2024.
+
+What we did: 
+- Take Gnomad v4.1.0; 
+- Filter each gene down to pathogenic or likely pathogenic variants
+- Filter down to non-neuro set not available yet; no prevention for enrichment of ALS/FTD cases or preconversion carrier controls
+

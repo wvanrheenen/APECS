@@ -1,0 +1,120 @@
+# Snakefile
+# command: snakemake -s snakefile --executor slurm --jobs 500 --default-resources mem_mb=1000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 4 --slurm-keep-successful-logs all
+
+# Define the number of simulations and how many to run per job
+SETS = ["1985", "1995", "2005", "2015", "2025", "2035", "2045", "2055", "2065"]
+
+ANALYSIS_REPETITIONS = 10
+
+# To balance no. of cases for each variable
+SET_MULTIPLIER = {
+    "1985": 1.0,
+    "1995": 1.0,
+    "2005": 1.2,
+    "2015": 1.2,
+    "2025": 1.4,
+    "2035": 1.8,
+    "2045": 2.0,
+    "2055": 2.5,
+    "2065": 2.7,
+}
+
+BASE_TOTAL_SIMULATIONS = 100000
+BASE_SIMULATIONS_PER_JOB = 1000
+REPS = list(range(1, ANALYSIS_REPETITIONS + 1))
+
+def total_sims_for_set(set_name):
+    return BASE_TOTAL_SIMULATIONS * SET_MULTIPLIER[set_name]
+
+def sims_per_job_for_set(set_name):
+    # if you want a fixed per-job size, keep this constant
+    return BASE_SIMULATIONS_PER_JOB
+
+def chunks_for_set(set_name):
+    total = int(total_sims_for_set(set_name))
+    per_job = sims_per_job_for_set(set_name)
+    return range(0, total, per_job)
+
+rule all:
+    input:
+        expand("results/{set}/aggregate_prediction_model.csv", set=SETS),
+        "results/plots/fALS_metrics.pdf"
+
+rule install_packages:
+    output:
+        touch("logs/packages_installed.txt")
+    script:
+        "../src/install_packages.R"
+
+rule run_simulation:
+    input:
+        packages = "logs/packages_installed.txt"
+    output:
+        results = "results/{set}/{rep}/simulations/simulation_{chunk}.csv",
+        metrics = "results/{set}/{rep}/metrics/metrics_{chunk}.csv",
+    threads: 2
+    params:
+        set = lambda wildcards: wildcards.set,
+        rep = lambda wildcards: wildcards.rep,
+        sims_per_job = lambda wildcards: sims_per_job_for_set(wildcards.set)
+    resources:
+        mem_mb=lambda wildcards: 50000 if wildcards.set == "testrun" else 2500
+    shell:
+        "Rscript simulation.R {params.set} {params.rep} {wildcards.chunk} {params.sims_per_job}"
+
+def simulation_files(wildcards):
+    return expand(
+        "results/{set}/{rep}/simulations/simulation_{chunk}.csv",
+        set=wildcards.set,
+        rep=wildcards.rep,
+        chunk=chunks_for_set(wildcards.set),
+    )
+
+def metrics_files(wildcards):
+    return expand(
+        "results/{set}/{rep}/metrics/metrics_{chunk}.csv",
+        set=wildcards.set,
+        rep=wildcards.rep,
+        chunk=chunks_for_set(wildcards.set),
+    )
+
+rule combine_results:
+    input:
+        results = simulation_files,
+        metrics = metrics_files
+    output:
+        combined_results = "results/{set}/{rep}/combined_simulations.csv",
+        combined_metrics = "results/{set}/{rep}/combined_metrics.csv",
+        prediction_model = "results/{set}/{rep}/prediction_model.csv",
+    params:
+        set = lambda wildcards: wildcards.set,
+        rep = lambda wildcards: wildcards.rep,
+    script:
+        "../src/combine_results.R"
+
+rule aggregate_repetitions:
+    input: 
+        prediction_models = lambda wildcards: expand(
+            "results/{set}/{rep}/prediction_model.csv", 
+            rep=REPS, 
+            set=wildcards.set
+        )
+    output: 
+        prediction_model = "results/{set}/aggregate_prediction_model.csv"
+    params:
+        set = lambda wildcards: wildcards.set
+    script:
+        "../src/aggregate_repetitions.R"
+ 
+
+rule plot_metrics:
+    input:
+        expand("results/{set}/aggregate_prediction_model.csv", set=SETS)
+    output:
+        "results/plots/fALS_metrics.pdf"
+    params:
+        sets = SETS
+    script:
+        "../src/plot_metrics.R"
+
+        

@@ -1,0 +1,47 @@
+{
+  "chart": {
+    "title": "Fertility rate: births per woman",
+    "subtitle": "The [total fertility rate](#dod:fertility-rate) summarizes the total number of births a woman would have, if she experienced the birth rates seen in women of each age group in one particular year across her childbearing years.",
+    "note": "",
+    "citation": "UN WPP (2024); HFD (2024)",
+    "originalChartUrl": "https://ourworldindata.org/grapher/children-born-per-woman?tab=chart&region=Europe&showSelectionOnlyInTable=1&country=Europe+%28UN%29~SWE~NLD&v=1&csvType=filtered&useColumnShortNames=false",
+    "selection": [
+      "World",
+      "United States",
+      "United Kingdom",
+      "Russia",
+      "Germany",
+      "Japan",
+      "India"
+    ]
+  },
+  "columns": {
+    "Fertility rate (period), historical": {
+      "titleShort": "Fertility rate",
+      "titleLong": "Fertility rate - period tables",
+      "descriptionShort": "The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.",
+      "descriptionKey": [
+        "Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.",
+        "Does not account for potential changes in social, economic, or health conditions that could affect fertility rates."
+      ],
+      "descriptionProcessing": "The fertility data is constructed by combining data from multiple sources:\n\n- Before 1950: Historical estimates by Human Fertility Database (2024).\n\n- 1950-2023: Population records by the UN World Population Prospects (2024 revision).",
+      "unit": "live births per woman",
+      "timespan": "1891-2023",
+      "type": "Numeric",
+      "owidVariableId": 1002450,
+      "shortName": "fertility_rate_hist",
+      "lastUpdated": "2024-12-03",
+      "nextUpdate": "2025-12-03",
+      "citationShort": "UN WPP (2024); HFD (2024) – with major processing by Our World in Data",
+      "citationLong": "UN WPP (2024); HFD (2024) – with major processing by Our World in Data. “Fertility rate – period tables” [dataset]. Human Fertility Database, “Human Fertility Database”; United Nations, “World Population Prospects” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/1002450.metadata.json"
+    }
+  },
+  "dateDownloaded": "2025-01-03",
+  "activeFilters": {
+    "country": "Europe (UN)~SWE~NLD",
+    "tab": "chart",
+    "region": "Europe",
+    "showSelectionOnlyInTable": "1"
+  }
+}

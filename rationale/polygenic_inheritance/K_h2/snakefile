@@ -1,0 +1,251 @@
+# snakemake -s snakefile --executor slurm --jobs 500 --default-resources mem_mb=5000 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 4 --slurm-keep-successful-logs all
+
+# Default fixed parameters
+default_params = {
+    "h2_als": "0.4",
+    "K_als": "0.4",
+    "h2_ftd": "0.4",
+    "K_ftd": "0.4",
+    "rg": "0.4",
+    "lam": "2",
+    "gen": "2",
+    "peds": "1000",
+    "times": 10
+}
+
+# Parameter sets to vary one at a time
+h2_als_vals = ["0.2", "0.4", "0.6", "0.8"]
+K_als_vals = ["0.2", "0.4", "0.6", "0.8"]
+h2_ftd_vals = ["0.2", "0.4", "0.6", "0.8"]
+K_ftd_vals = ["0.2", "0.4", "0.6", "0.8"]
+rg_vals = ["0.2", "0.4", "0.6", "0.8"]
+lambda_vals = ["1", "2", "3", "6"]
+k_vals = ["2", "3", "4"]
+
+# e.g. integer replicates from 1 to times
+replicates = list(range(1, default_params["times"] + 1))
+
+
+rule all_h2:
+    input:
+        # Vary K_als, others default
+        expand(
+            "results/h2_als/varying_K_als/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=h2_als_vals,
+            K_als=K_als_vals,
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=[default_params["K_ftd"]],
+            rg=[default_params["rg"]],
+            lam=[default_params["lam"]],
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary h2_ftd, others default
+        expand(
+            "results/h2_als/varying_h2_ftd/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=h2_als_vals,
+            K_als=[default_params["K_als"]],
+            h2_ftd=h2_ftd_vals,
+            K_ftd=[default_params["K_ftd"]],
+            rg=[default_params["rg"]],
+            lam=[default_params["lam"]],
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary K_ftd, others default
+        expand(
+            "results/h2_als/varying_K_ftd/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=h2_als_vals,
+            K_als=[default_params["K_als"]],            
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=K_ftd_vals,
+            rg=[default_params["rg"]],
+            lam=[default_params["lam"]],
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary rg, others default
+        expand(
+            "results/h2_als/varying_rg/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=h2_als_vals,
+            K_als=[default_params["K_als"]],            
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=[default_params["K_ftd"]],
+            rg=rg_vals,
+            lam=[default_params["lam"]],
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary lambda, others default
+        expand(
+            "results/h2_als/varying_lambda/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=h2_als_vals,
+            K_als=[default_params["K_als"]],            
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=[default_params["K_ftd"]],
+            rg=[default_params["rg"]],
+            lam=lambda_vals,
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary gen, others default
+        expand(
+            "results/h2_als/varying_gen/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=h2_als_vals,
+            K_als=[default_params["K_als"]],            
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=[default_params["K_ftd"]],
+            rg=[default_params["rg"]],
+            lam=[default_params["lam"]],
+            gen=k_vals,
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        )
+
+
+rule all_K:
+    input:
+        # Vary h2_als, others default
+        expand(
+            "results/K_als/varying_h2_als/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=h2_als_vals,
+            K_als=K_als_vals,
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=[default_params["K_ftd"]],
+            rg=[default_params["rg"]],
+            lam=[default_params["lam"]],
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary h2_ftd, others default
+        expand(
+            "results/K_als/varying_h2_ftd/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=[default_params["h2_als"]],
+            K_als=K_als_vals,
+            h2_ftd=h2_ftd_vals,
+            K_ftd=[default_params["K_ftd"]],
+            rg=[default_params["rg"]],
+            lam=[default_params["lam"]],
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary K_ftd, others default
+        expand(
+            "results/K_als/varying_K_ftd/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=[default_params["h2_als"]],
+            K_als=K_als_vals,        
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=K_ftd_vals,
+            rg=[default_params["rg"]],
+            lam=[default_params["lam"]],
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary rg, others default
+        expand(
+            "results/K_als/varying_rg/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=[default_params["h2_als"]],
+            K_als=K_als_vals,        
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=[default_params["K_ftd"]],
+            rg=rg_vals,
+            lam=[default_params["lam"]],
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary lambda, others default
+        expand(
+            "results/K_als/varying_lambda/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=[default_params["h2_als"]],
+            K_als=K_als_vals,          
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=[default_params["K_ftd"]],
+            rg=[default_params["rg"]],
+            lam=lambda_vals,
+            gen=[default_params["gen"]],
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        ) + \
+        # Vary gen, others default
+        expand(
+            "results/K_als/varying_gen/h2_{h2_als}_Kals_{K_als}_h2ftd_"
+            "{h2_ftd}_Kftd_{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_"
+            "{peds}_rep_{replicate}.out",
+            h2_als=[default_params["h2_als"]],
+            K_als=K_als_vals,         
+            h2_ftd=[default_params["h2_ftd"]],
+            K_ftd=[default_params["K_ftd"]],
+            rg=[default_params["rg"]],
+            lam=[default_params["lam"]],
+            gen=k_vals,
+            peds=[default_params["peds"]],
+            replicate=replicates,
+        )
+
+rule run_simulation:
+    output:
+        "results/{outcome}/{varying_param}/h2_{h2_als}_Kals_{K_als}_h2ftd_{h2_ftd}_Kftd_"
+        "{K_ftd}_rg_{rg}_lam_{lam}_gen_{gen}_peds_{peds}_rep_{replicate}.out"
+    params:
+        h2_als = "{h2_als}",
+        K_als = "{K_als}",
+        h2_ftd = "{h2_ftd}",
+        K_ftd = "{K_ftd}",
+        rg = "{rg}",
+        lam = "{lam}",
+        gen = "{gen}",
+        peds = "{peds}",
+        varying_param = "{varying_param}"
+    shell:
+        """
+        mkdir -p results/{wildcards.outcome}/{params.varying_param}
+        Rscript polygenic_K_h2.R \
+            --heritability_als {params.h2_als} \
+            --lifetimerisk_als {params.K_als} \
+            --heritability_ftd {params.h2_ftd} \
+            --lifetimerisk_ftd {params.K_ftd} \
+            --genetic_correlation {params.rg} \
+            --lambda {params.lam} \
+            --generations {params.gen} \
+            --peds {params.peds} \
+            --times 1 \
+            --out {output}
+        """
+
+
+rule all:
+    input:
+        rules.all_h2.input + rules.all_K.input
+
+

@@ -1,16 +1,19 @@
+# Overview of files not to upload to git
+
+# Software used (R, snakemake), not to be uploaded
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 .snakemake
-results
-old
-building_pred*
+
+# Directories not to upload
+heritability_contribution
 logs
-results*
-progeny*
-varying_parameters*
-rationale*
-ALPINE*
-data*
-predic*
+simulations # these are the subdirectories in every results directory (in main analyses, ALPINE_plug, or varying_params directory)
+metrics # these are the subdirectories in every results directory (in main analyses, ALPINE_plug, or varying_params directory)
+
+# Results not to upload
+*.csv
+*.pdf
+*.tsv

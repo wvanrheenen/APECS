@@ -1,7 +1,0 @@
-slurm:
-  default-resources:
-    - mem_mb=8000
-    - runtime=28800
-  jobscript: "slurm-jobscript.sh"
-  extra: "--time={resources.runtime} --mem={resources.mem_mb} --constraint=avx2"
-  

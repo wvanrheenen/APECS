@@ -1,18 +1,56 @@
-# simPed
-a pedigree simulation for complex and Mendelian traits
+# SimPlex
+A framework to simulate ALS and ALS-associated disease under a monogenic/Mendelian and polygenic/complex disease model.
+
+## Github Architecture
+In this main directory, you'll find 'snakefile', the pipeline needed to run the simulations, as per our main analyses in the article. The results of this analysis will be written to the 'results' subdirectory. 
+
+This is a list of the subdirectories in our main github page:
+- interactive_tutorial:
+  - Here, you'll find an interactive R script with an introductory explanation file
+- src:
+  - This directory contains the main functions required to run all analyses. 
+  - Further subdirectories may contain adaptations of the main functions found in this src directory. 
+- varying_parameters:
+  - This directory contains the files needed for the sensitivity analyses in our main article.
+- rationale:
+  - This directory contains the data required to validate whether the simulations match input parameters, real world demographic data and if the simulations actually simulate phenotypic traits as is expected.
+  - A separate README.md file is available for explanation on each rationale step.
+- data:
+  - This directory contains gathered and processed real world demographic and genetic data required to run the simulations.
+- ALPINE_plug:
+  - This directory contains a pipeline needed to run analyses on cryptic distant relatives in monogenic index patient pedigrees.
 
 ## Setup
-This is a list of required R packages: 
-- tidyverse: manipulation of dataframes
-- MASS: to sample from multvariate normal distribution
-- mvnfast: to sample from multvariate normal distribution, fast
+For parallelization of simulation, we require installation of snakemake
+
+This is a list of required R packages:
+- argparse: command line argument parsing
+- data.table: fast data manipulation
+- R.utils: utility functions
+- tidyverse: manipulation of dataframes (dplyr, tidyr, etc.)
+- MASS: to sample from multivariate normal distribution
+- mvnfast: to sample from multivariate normal distribution, fast
+- kinship2: pedigree and kinship analysis
+- sn: skew-normal distribution sampling
+- igraph: network analysis and visualization
 - pedtools: generates pedigree structures, for plotting and calculating kinship matrix
 - ribd: calculate kinship matrix for pedigrees
 - RColorBrewer: for plotting polygenic G values
+- this.path: get script path
+- wesanderson: color palettes for plotting in article
+- broom: convert statistical objects to tidy data
+- fmsb: miscellaneous functions (radar charts)
+- patchwork: plot composition
+- dplyr: data manipulation (tidyverse core)
+- tidyr: data tidying (tidyverse core)
 
-
+```r
+required_packages <- c(
+  "argparse", "data.table", "R.utils", "tidyverse", "MASS", "mvnfast", 
+  "kinship2", "sn", "igraph", "pedtools", "ribd", "RColorBrewer", 
+  "this.path", "wesanderson", "broom", "fmsb", "patchwork", "dplyr", "tidyr"
+)
+install.packages(required_packages)
 ```
-packages = c("tidyverse", "MASS", "mvnfast", "pedtools", "ribd", "RcolorBrewer")
-install.packages(packages)
-```
 
+These are loaded via `src/libraries_simPed.R`.
