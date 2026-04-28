@@ -96,14 +96,22 @@ For non-founders, genetic values are simulated conditional on parental values
 ($G_p, G_m$). The offspring mean is the mid-parent value, and the variance is 
 $0.5 \times h^2$ per trait. Offspring values are drawn from a multivariate 
 normal distribution to maintain specified trait correlations:
-$\mathbf{G}_{offspring} \sim N\left(\frac{\mathbf{G}_p + \mathbf{G}_m}{2}, \mathbf{V}_{g, offspring}\right)$
+
+$$
+\mathbf{G}_{offspring} \sim N\left(\frac{\mathbf{G}_p + \mathbf{G}_m}{2}, \mathbf{V}_{g, offspring}\right)
+$$
+
 where $\mathbf{V}_{g, offspring}$ uses the same correlation structure but 
 scaled to reflect the reduction in variance due to segregation ($0.5 \times h^2$). 
 Environmental components are subsequently assigned as $E \sim N(0, 1 - h^2)$.
 
 Disease status is determined by the liability threshold model. For each trait,
 the individual liability $P$ is compared to a lifetime-risk threshold ($t$), defined as:
-$t = -\text{qnorm}(K)$
+
+$$
+t = -\text{qnorm}(K)
+$$
+
 where $K$ is the population lifetime risk. If $P > t$, the individual is assigned 
 an age at onset—if this occurs before their age at censoring, they are classified as affected. 
 
