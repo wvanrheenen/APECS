@@ -698,6 +698,7 @@ h2_dementia = 0.55 # Dijkstra 2025; lowered to compensate for prevalence of e.g.
 rg_ALSFTD = 0.6 # vRheenen 2021
 rg_ALSdem = 0.25 # vRheenen 2021, Wainberg 2023, Chen 2024
 rg_FTDdem = 0.35 # vRheenen 2021, Chen 2024
+
 ```
 
 ### Step 1. Simulate the core pedigree 
