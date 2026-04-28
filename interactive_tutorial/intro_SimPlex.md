@@ -11,15 +11,15 @@ Wouter van Rheenen, Paul Beele
 
 ### Simulating family members:
 
-The pedigree consists of core pedigree (C) with one single founder this
+The pedigree consists of core pedigree (C) with one single founder that
 is initiated by function `init_ped()`. The birthyear of each founder is selected
 by taking the birthyear of the final `k`th generation and sampling `k` times
 from a normal distibution with mean = 30, truncated at 25 to 35 years back. 
 
 Then offspring generation will be simulated using the `add_gen()`
-function, IDs start with “C” and the number reflects order of offspring
+function. IDs start with “C” and the number reflects the order of offspring
 (C0_1 for oldest, C0_2 for second child). In the third generation offspring
-of the oldest is denoted as C0_1\_\[0-9\] and second C0_2\_\[0-9\] etc.
+of the oldest is denoted as C0_1\_\[0-9\], then the second C0_2\_\[0-9\] etc.
 etc... This way, all individuals in this lineage IDs can be traced to
 founder. 
 
@@ -86,10 +86,11 @@ by genetic effects. The residual variance is defined as $1 - h^2$.
 
 For founders, genetic values for correlated traits (ALS, FTD, and dementia)
 are sampled jointly from a multivariate normal distribution: 
-$\mathbf{G}_{founder} \sim N(\mathbf{0}, \mathbf{V}_g)$
-
-where $\mathbf{V}_g$ is the covariance matrix constructed from trait 
-heritabilities and their pairwise genetic correlations ($rg$). 
+$$
+\mathbf{G}_{founder} \sim N(\mathbf{0}, \mathbf{V}_g)
+$$
+is the covariance matrix constructed from trait heritabilities and their 
+pairwise genetic correlations ($rg$). 
 
 For non-founders, genetic values are simulated conditional on parental values 
 ($G_p, G_m$). The offspring mean is the mid-parent value, and the variance is 
@@ -102,9 +103,7 @@ Environmental components are subsequently assigned as $E \sim N(0, 1 - h^2)$.
 
 Disease status is determined by the liability threshold model. For each trait,
 the individual liability $P$ is compared to a lifetime-risk threshold ($t$), defined as:
-$$
-t = -\text{qnorm}(K)
-$$
+$t = -\text{qnorm}(K)$
 where $K$ is the population lifetime risk. If $P > t$, the individual is assigned 
 an age at onset—if this occurs before their age at censoring, they are classified as affected. 
 
@@ -114,11 +113,11 @@ Limitations to polygenic model:
 - There is no assortative mating
 - Heritability is additive, there is no epistasis/dominance 
 
-\## R code and functions.
+## R code and functions.
 
 ``` r
-source("src/libraries_simPed.R")
-source("src/functions_simPed.R")
+source("../src/libraries_simPed.R")
+source("../src/functions_simPed.R")
 ```
 
 ### Function to initiate pedigree with one founder with a mutation
@@ -127,7 +126,7 @@ source("src/functions_simPed.R")
 print(init_ped)
 ```
 
-init_ped = function(DAF_common, DAF_patho, DAF_ftd, k, mean_gen_yr, yob_index, life_expectancy, current_year){
+    # init_ped = function(DAF_common, DAF_patho, DAF_ftd, k, mean_gen_yr, yob_index, life_expectancy, current_year){
     #   core_ped = data.frame(gen = 0, # generation
     #                         id = "C0", # individual id - founder
     #                         pid = as.character(NA), # parental id
@@ -163,7 +162,7 @@ init_ped = function(DAF_common, DAF_patho, DAF_ftd, k, mean_gen_yr, yob_index, l
 print(add_gen)
 ```
 
-add_gen = function(df_ped, lambda, k, DAF_common, DAF_patho, DAF_ftd, fert_rate, mean_gen_yr, life_expectancy, current_year){
+    # add_gen = function(df_ped, lambda, k, DAF_common, DAF_patho, DAF_ftd, fert_rate, mean_gen_yr, life_expectancy, current_year){
     #   g = 0
     #   core_lineage <- "C0"
     #   core_offspring_created <- FALSE   
@@ -335,154 +334,268 @@ print(add_inlaws)
 print(add_pheno)
 ```
 
-add_ext_branches = function(df_ped, lambda, k, DAF_common, DAF_patho, DAF_ftd, mean_gen_yr, fert_rate, life_expectancy, current_year){
-    #   g = 0
-    #   while(g < k){
-    #     # First, for pairs already in df_ped then select only mothers from the parental generation # sex is irrelevant in this simulation
-    #     I1s = mutate(df_ped, id_parents = gsub("_[a-z]$", "", id)) %>% # create temporary variable ID minus _p or _m (so parents have same ID)
-    #       group_by(id_parents) %>%
-    #       filter(n() > 1) %>% # filter for parental couple
-    #       ungroup() %>%
-    #       filter(grepl("m$", id) & gen == g) # select only mothers in generation of offspring
-    #     if(nrow(I1s > 0)){
-    #       # for each mother
-    #       for(i in 1:nrow(I1s)){
-    #         gen_yr = generate_gen_yr(mean_gen_yr)
-    #         # find father that is already in pedigree
-    #         I2_id = gsub("_m$", "_p", I1s$id[i])
-    #         I2 = filter(df_ped, id == I2_id)
-    #         if(! nrow(I2 == 1)){
-    #           print(I2)
-    #           print(I2_id)
-    #           stop("Non-unique IDs found!!")
-    #         }
-    #         # simulate number of offspring from negative binomial distribution with mean lambda (as defined by general pedigree parameters, or obtained from fertility rate and birthyear)
-    #         if(is.na(lambda)){
-    #           n_II = rnbinom(1, size = 5, mu = fert_rate[fert_rate$year == (I1s$yob[i] + gen_yr), "mean_fertility"]) - 1 # minus 1 because one child has already been simulated in first round
-    #         } else { 
-    #           n_II = rnbinom(1, size = 5, mu = lambda) - 1 # minus 1 because one child has already been simulated in first round
-    #         }
-    #         n_II = min(n_II, 15) # Cap at 15
-    #         # simulate offspring simulate to add_gen() function
-    #         if(n_II > 0){
-    #           IIs = as.data.frame(matrix(NA, nrow=n_II, ncol=ncol(df_ped)))
-    #           colnames(IIs) = colnames(df_ped)
-    #           j = 0
-    #           while(j < n_II){
-    #             j = j+1
-    #             IIs$gen[j] = g + 1
-    #             IIs$id[j]  = paste(I1s$id[i], j, sep="_")
-    #             IIs$pid[j] = I2_id
-    #             IIs$mid[j] = I1s$id[i]
-    #             IIs$sex[j] = sample(c(0,1), 1)
-    #             IIs$a1_common[j]  = sample(c(I1s$a1_common[i], I1s$a2_common[i]), 1) # a1 is always from mother - here, I1
-    #             IIs$a2_common[j]  = sample(c(I2$a1_common, I2$a2_common), 1)
-    #             IIs$a1_patho[j]  = sample(c(I1s$a1_patho[i], I1s$a2_patho[i]), 1) # a1 is always from mother - here, I1
-    #             IIs$a2_patho[j]  = sample(c(I2$a1_patho, I2$a2_patho), 1)
-    #             IIs$a1_ftd[j]  = sample(c(I1s$a1_ftd[i], I1s$a2_ftd[i]), 1) # a1 is always from mother - here, I1
-    #             IIs$a2_ftd[j]  = sample(c(I2$a1_ftd, I2$a2_ftd), 1)            
-    #             IIs$yob[j] = I1s$yob[i] + gen_yr
-    #             IIs$mean_life_exp[j] = life_expectancy$life_expectancy[life_expectancy$year_of_birth == IIs$yob[j]]
-    #             IIs$life_expectancy[j] = sample_life_expectancy(IIs$mean_life_exp[j])
-    #             IIs$age[j] = current_year - IIs$yob[j]
-    #             if(IIs$age[j] > IIs$life_expectancy[j]){
-    #               IIs$status[j] = "dead"
-    #               IIs$age_censored[j] = IIs$life_expectancy[j]
-    #             } else {
-    #               IIs$status[j] = "alive"
-    #               IIs$age_censored[j] = IIs$age[j]
-    #             }
-    #           }
-    #           df_ped = bind_rows(df_ped, IIs)
-    #         }
-    #       }
+add_pheno = function(df_ped, disease_onset, penetrance_ALS_common, penetrance_ALS_patho, h2_ALS, K_ALS, penetrance_FTD_common, 
+    #                       penetrance_FTD_patho, penetrance_FTD_nonALS, h2_FTD, K_FTD, penetrance_dem_common, penetrance_dem_patho, h2_dementia, K_dementia, 
+    #                       rg_ALSFTD, rg_ALSdem, rg_FTDdem) {
+      
+    #   df_ped = df_ped %>%
+    #     rowwise() %>%
+    #     mutate(
+    #       mendel_ALS_y1_common = ifelse(a1_common == 1, rbinom(1, 1, penetrance_ALS_common), 0),
+    #       mendel_ALS_y2_common = ifelse(a2_common == 1, rbinom(1, 1, penetrance_ALS_common), 0),
+    #       mendel_ALS_y1_patho  = ifelse(a1_patho == 1, rbinom(1, 1, penetrance_ALS_patho), 0),
+    #       mendel_ALS_y2_patho  = ifelse(a2_patho == 1, rbinom(1, 1, penetrance_ALS_patho), 0), 
+          
+    #       age_mendel_ALS_Y_common = ifelse(mendel_ALS_y1_common == 1 | mendel_ALS_y2_common == 1, 
+    #                                        sample_onset_age(disease_onset, "C9_ALS"), NA),
+    #       age_mendel_ALS_Y_patho = ifelse(mendel_ALS_y1_patho == 1 | mendel_ALS_y2_patho == 1, 
+    #                                       sample_onset_age(disease_onset, "C9_ALS"), NA),  # Change column if needed
+          
+    #       mendel_ALS_Y_common = ifelse(!is.na(age_mendel_ALS_Y_common) & age_mendel_ALS_Y_common <= age_censored, 1, 0),
+    #       mendel_ALS_Y_patho  = ifelse(!is.na(age_mendel_ALS_Y_patho)  & age_mendel_ALS_Y_patho  <= age_censored, 1, 0),
+    #       mendel_ALS_Y = ifelse(mendel_ALS_Y_common + mendel_ALS_Y_patho > 0, 1, 0)
+    #     ) %>%
+    #     ungroup()
+
+    #   # FTD section
+    #   df_ped = df_ped %>%
+    #     rowwise() %>%
+    #     mutate(
+    #       mendel_FTD_y1_common = ifelse(a1_common == 1, rbinom(1, 1, penetrance_FTD_common), 0),
+    #       mendel_FTD_y2_common = ifelse(a2_common == 1, rbinom(1, 1, penetrance_FTD_common), 0),
+    #       mendel_FTD_y1_patho  = ifelse(a1_patho == 1, rbinom(1, 1, penetrance_FTD_patho), 0),
+    #       mendel_FTD_y2_patho  = ifelse(a2_patho == 1, rbinom(1, 1, penetrance_FTD_patho), 0),
+    #       mendel_FTD_y1_ftd    = ifelse(a1_ftd   == 1, rbinom(1, 1, penetrance_FTD_nonALS), 0),
+    #       mendel_FTD_y2_ftd    = ifelse(a2_ftd   == 1, rbinom(1, 1, penetrance_FTD_nonALS), 0),
+    #       age_mendel_FTD_Y_common = ifelse(mendel_FTD_y1_common == 1 | mendel_FTD_y2_common == 1, 
+    #                                        sample_onset_age(disease_onset, "C9_FTD"), NA),
+    #       age_mendel_FTD_Y_patho  = ifelse(mendel_FTD_y1_patho == 1 | mendel_FTD_y2_patho == 1, 
+    #                                        sample_onset_age(disease_onset, "C9_FTD"), NA), # Change column if needed
+    #       age_mendel_FTD_Y_ftd    = ifelse(mendel_FTD_y1_ftd == 1 | mendel_FTD_y2_ftd == 1, 
+    #                                        sample_onset_age(disease_onset, "C9_FTD"), NA), # Or GRN/MAPT if available
+    #       mendel_FTD_Y_common = ifelse(!is.na(age_mendel_FTD_Y_common) & age_mendel_FTD_Y_common <= age_censored, 1, 0),
+    #       mendel_FTD_Y_patho  = ifelse(!is.na(age_mendel_FTD_Y_patho)  & age_mendel_FTD_Y_patho  <= age_censored, 1, 0),
+    #       mendel_FTD_Y_ftd    = ifelse(!is.na(age_mendel_FTD_Y_ftd)    & age_mendel_FTD_Y_ftd    <= age_censored, 1, 0),
+    #       mendel_FTD_Y = ifelse(mendel_FTD_Y_common + mendel_FTD_Y_patho + mendel_FTD_Y_ftd > 0, 1, 0)
+    #     ) %>%
+    #     ungroup()
+
+    #   df_ped = df_ped %>%
+    #     rowwise() %>%
+    #     mutate(
+    #       mendel_dem_y1_common = ifelse(a1_common == 1, rbinom(1, 1, penetrance_dem_common), 0),
+    #       mendel_dem_y2_common = ifelse(a2_common == 1, rbinom(1, 1, penetrance_dem_common), 0),
+    #       mendel_dem_y1_patho  = ifelse(a1_patho == 1, rbinom(1, 1, penetrance_dem_patho), 0),
+    #       mendel_dem_y2_patho  = ifelse(a2_patho == 1, rbinom(1, 1, penetrance_dem_patho), 0), 
+          
+    #       age_mendel_dem_Y_common = ifelse(mendel_dem_y1_common == 1 | mendel_dem_y2_common == 1, 
+    #                                        sample_onset_age(disease_onset, "C9_Dementia"), NA),
+    #       age_mendel_dem_Y_patho = ifelse(mendel_dem_y1_patho == 1 | mendel_dem_y2_patho == 1, 
+    #                                       sample_onset_age(disease_onset, "C9_Dementia"), NA),  # Change column if needed
+          
+    #       mendel_dem_Y_common = ifelse(!is.na(age_mendel_dem_Y_common) & age_mendel_dem_Y_common <= age_censored, 1, 0),
+    #       mendel_dem_Y_patho  = ifelse(!is.na(age_mendel_dem_Y_patho)  & age_mendel_dem_Y_patho  <= age_censored, 1, 0),
+    #       mendel_dem_Y = ifelse(mendel_dem_Y_common + mendel_dem_Y_patho > 0, 1, 0)
+    #     ) %>%
+    #     ungroup()
+
+
+    #   # polygenic model:
+    #   df_ped$G_ALS = NA
+    #   df_ped$G_FTD = NA
+    #   df_ped$G_dementia = NA
+      
+    #   # Sample G from multivariate normal for founders
+    #   founders = which(is.na(df_ped$pid)) 
+    #   # ALS and FTD, correlated
+    #   Vg = matrix(c(
+    #     h2_ALS,
+    #     rg_ALSFTD * sqrt(h2_ALS * h2_FTD),
+    #     rg_ALSdem * sqrt(h2_ALS * h2_dementia),
+
+    #     rg_ALSFTD * sqrt(h2_ALS * h2_FTD),
+    #     h2_FTD,
+    #     rg_FTDdem * sqrt(h2_FTD * h2_dementia),
+
+    #     rg_ALSdem * sqrt(h2_ALS * h2_dementia),
+    #     rg_FTDdem * sqrt(h2_FTD * h2_dementia),
+    #     h2_dementia
+    #   ), nrow = 3, byrow = TRUE)
+
+    #   Gs = mvrnorm(length(founders), mu = c(0, 0, 0), Sigma = Vg)
+
+    #   df_ped$G_ALS[founders]       = Gs[, 1]
+    #   df_ped$G_FTD[founders]       = Gs[, 2]
+    #   df_ped$G_dementia[founders]  = Gs[, 3]
+
+    #   empirical_rg_ALSFTD = cor(df_ped$G_ALS[founders], df_ped$G_FTD[founders])
+    #   empirical_rg_ALSdem = cor(df_ped$G_ALS[founders], df_ped$G_dementia[founders])
+    #   empirical_rg_FTDdem = cor(df_ped$G_FTD[founders], df_ped$G_dementia[founders])
+      
+
+    #   # loop through nonfounders and estimate G based on G of parents and h2
+    #   for(i in 1:nrow(df_ped)){
+    #     if(is.na(df_ped$G_ALS[i])){
+    #       pid = df_ped$pid[i]
+    #       mid = df_ped$mid[i]
+    #       Gp_ALS = df_ped[which(df_ped$id == pid),]$G_ALS
+    #       Gm_ALS = df_ped[which(df_ped$id == mid),]$G_ALS
+    #       Gp_FTD = df_ped[which(df_ped$id == pid),]$G_FTD
+    #       Gm_FTD = df_ped[which(df_ped$id == mid),]$G_FTD
+    #       Gp_dem = df_ped[which(df_ped$id == pid),]$G_dementia
+    #       Gm_dem = df_ped[which(df_ped$id == mid),]$G_dementia      
+          
+    #       # Calculate mean and variance for offspring's G
+    #       mean_ALS = (Gp_ALS + Gm_ALS) / 2
+    #       var_ALS = 0.5 * h2_ALS
+    #       mean_FTD = (Gp_FTD + Gm_FTD) / 2
+    #       var_FTD = 0.5 * h2_FTD
+    #       mean_dem = (Gp_dem + Gm_dem) / 2
+    #       var_dem = 0.5 * h2_dementia
+
+    #       # Simulate correlated G for offspring
+    #       Vg_offspring = matrix(c(
+    #         var_ALS,
+    #         rg_ALSFTD * sqrt(var_ALS * var_FTD),
+    #         rg_ALSdem  * sqrt(var_ALS * var_dem),
+
+    #         rg_ALSFTD * sqrt(var_ALS * var_FTD),
+    #         var_FTD,
+    #         rg_FTDdem * sqrt(var_FTD * var_dem),
+
+    #         rg_ALSdem  * sqrt(var_ALS * var_dem),
+    #         rg_FTDdem * sqrt(var_FTD * var_dem),
+    #         var_dem
+    #       ), nrow = 3, byrow = TRUE)
+
+    #       Gs_offspring = mvrnorm(n = 1, mu = c(mean_ALS, mean_FTD, mean_dem), Sigma = Vg_offspring)
+          
+    #       df_ped$G_ALS[i] = Gs_offspring[1]
+    #       df_ped$G_FTD[i] = Gs_offspring[2]
+    #       df_ped$G_dementia[i] = Gs_offspring[3]
     #     }
-        
-    #     # Second, find NF who don't have a partner yet (the offspring simulated in previous loop)
-    #     # these have IDs ending with a digit, but do have either "p" or "m" in their IDs
-    #     I1s = filter(df_ped, gen == g & 
-    #                    (grepl("p", id) | grepl("m", id)) &
-    #                    ! (grepl("p$", id) | grepl("m$", id)))
-    #     if(nrow(I1s > 0)){
-    #       for(i in 1:nrow(I1s)){
-    #         gen_yr = generate_gen_yr(mean_gen_yr)
-    #         I2 = data.frame(gen = g, 
-    #                         id = paste0("P",I1s$id[i]),
-    #                         pid = NA, 
-    #                         mid = NA, 
-    #                         sex = abs(I1s$sex[i] - 1),
-    #                         a1_common  = sample(c(0,1), 1, prob=c(1-DAF_common, DAF_common)),
-    #                         a2_common  = sample(c(0,1), 1, prob=c(1-DAF_common, DAF_common)),
-    #                         a1_patho  = sample(c(0,1), 1, prob=c(1-DAF_patho, DAF_patho)),
-    #                         a2_patho  = sample(c(0,1), 1, prob=c(1-DAF_patho, DAF_patho)),
-    #                         a1_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)),
-    #                         a2_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)),
-    #                         yob = I1s$yob[i])
-    #         I2$mean_life_exp = life_expectancy$life_expectancy[life_expectancy$year_of_birth == I2$yob]
-    #         I2$life_expectancy = sample_life_expectancy(I2$mean_life_exp)        
-    #         I2$age = current_year - I2$yob
-    #         if(I2$age > I2$life_expectancy){
-    #           I2$status = "dead"
-    #           I2$age_censored = I2$life_expectancy
-    #         } else {
-    #           I2$status = "alive"
-    #           I2$age_censored = I2$age
-    #         }                
-    #         # simulate number of offspring from negative binomial distribution with mean lambda (as defined by general pedigree parameters, or obtained from fertility rate and birthyear)
-    #         if(is.na(lambda)){
-    #           n_II = rnbinom(1, size = 5, mu = fert_rate[fert_rate$year == (I1s$yob[i] + gen_yr), "mean_fertility"])
-    #         } else { 
-    #           n_II = rnbinom(1, size = 5, mu = lambda)
-    #         }
-    #         n_II = min(n_II, 15) # Cap at 15
-    #         # create data_frame for offspring:
-    #         IIs = as.data.frame(matrix(NA, nrow=n_II, ncol=ncol(df_ped)))
-    #         colnames(IIs) = colnames(df_ped)
-    #         j = 0
-    #         while(j < n_II){
-    #           j = j+1
-    #           IIs$gen[j] = g + 1
-    #           IIs$id[j]  = paste(I1s$id[i], j, sep="_")
-    #           IIs$pid[j] = ifelse(I1s$sex[i] == 0, I1s$id[i], I2$id)
-    #           IIs$mid[j] = ifelse(I1s$sex[i] == 1, I1s$id[i], I2$id)
-    #           IIs$sex[j] = sample(c(0,1), 1)
-    #           IIs$a1_common[j]  = sample(c(I1s$a1_common[i], I1s$a2_common[i]), 1)
-    #           IIs$a2_common[j]  = sample(c(I2$a1_common, I2$a2_common), 1)
-    #           IIs$a1_patho[j]  = sample(c(I1s$a1_patho[i], I1s$a2_patho[i]), 1)
-    #           IIs$a2_patho[j]  = sample(c(I2$a1_patho, I2$a2_patho), 1)
-    #           IIs$a1_ftd[j]  = sample(c(I1s$a1_ftd[i], I1s$a2_ftd[i]), 1)
-    #           IIs$a2_ftd[j]  = sample(c(I2$a1_ftd, I2$a2_ftd), 1) 
-    #           IIs$yob[j] = I1s$yob[i] + gen_yr
-    #           IIs$mean_life_exp[j] = life_expectancy$life_expectancy[life_expectancy$year_of_birth == IIs$yob[j]]
-    #           IIs$life_expectancy[j] = sample_life_expectancy(IIs$mean_life_exp[j])
-    #           IIs$age[j] = current_year - IIs$yob[j]
-    #           if(IIs$age[j] > IIs$life_expectancy[j]){
-    #             IIs$status[j] = "dead"
-    #             IIs$age_censored[j] = IIs$life_expectancy[j]
-    #           } else {
-    #             IIs$status[j] = "alive"
-    #             IIs$age_censored[j] = IIs$age[j]
-    #           }
-    #         }
-    #         if(n_II > 0){
-    #           df_ped = bind_rows(df_ped, I2, IIs)
-    #         } else {
-    #           df_ped = bind_rows(df_ped, I2)
-    #         }
-    #       }
-    #     }
-    #     g = g+1
     #   }
+      
+    #   # sample non-genetic value E:
+    #   # Without genetic correlation
+    #   df_ped$E_ALS = rnorm(nrow(df_ped), 0, sqrt(1-h2_ALS))
+    #   df_ped$E_FTD = rnorm(nrow(df_ped), 0, sqrt(1-h2_FTD))
+    #   df_ped$E_dementia = rnorm(nrow(df_ped), 0, sqrt(1-h2_dementia))
+
+    #   # Polygenic ALS phenotype using constant (lifetime) risk
+    #   df_ped$P_ALS = df_ped$G_ALS + df_ped$E_ALS
+    #   df_ped$LT_ALS = -qnorm(K_ALS, 0, 1)
+    #   df_ped$passed_ALS_LT = ifelse(df_ped$P_ALS > df_ped$LT_ALS, 1, 0)
+    #   df_ped$age_polygenicY_ALS = mapply(
+    #     function(passed) if (passed == 1) sample_onset_age(disease_onset, "Polygenic_ALS") else NA,
+    #     df_ped$passed_ALS_LT
+    #   ) 
+    #   df_ped$polygenicY_ALS = ifelse(!is.na(df_ped$age_polygenicY_ALS) & df_ped$age_polygenicY_ALS <= df_ped$age_censored, 1, 0)
+
+
+    #   # Polygenic FTD phenotype using constant (lifetime) risk
+    #   df_ped$P_FTD = df_ped$G_FTD + df_ped$E_FTD
+    #   df_ped$LT_FTD = -qnorm(K_FTD, 0, 1)
+    #   df_ped$passed_FTD_LT = ifelse(df_ped$P_FTD > df_ped$LT_FTD, 1, 0)
+    #   df_ped$age_polygenicY_FTD = mapply(
+    #     function(passed) if (passed == 1) sample_onset_age(disease_onset, "Polygenic_FTD") else NA,
+    #     df_ped$passed_FTD_LT
+    #   ) 
+    #   df_ped$polygenicY_FTD = ifelse(!is.na(df_ped$age_polygenicY_FTD) & df_ped$age_polygenicY_FTD <= df_ped$age_censored, 1, 0)
+
+    #   # define phenotype other dementias
+    #   # Polygenic dementia phenotype using constant (lifetime) risk
+    #   df_ped$P_dementia = df_ped$G_dementia + df_ped$E_dementia
+    #   df_ped$LT_dem = -qnorm(K_dementia, 0, 1)
+    #   df_ped$passed_dem_LT = ifelse(df_ped$P_dementia > df_ped$LT_dem, 1, 0)
+    #   df_ped$age_polygenicY_dementia = mapply(
+    #     function(passed) if (passed == 1) sample_onset_age(disease_onset, "Polygenic_Dementia") else NA,
+    #     df_ped$passed_dem_LT
+    #   ) 
+    #   df_ped$polygenicY_dementia = ifelse(!is.na(df_ped$age_polygenicY_dementia) & df_ped$age_polygenicY_dementia <= df_ped$age_censored, 1, 0)
+
+    #   # final phenotype
+    #   df_ped$Y_ALS = ifelse(df_ped$polygenicY_ALS + df_ped$mendel_ALS_Y > 0, 1, 0)
+    #   df_ped$Y_FTD = ifelse(df_ped$polygenicY_FTD + df_ped$mendel_FTD_Y > 0, 1, 0)
+    #   df_ped$Y_dementia_other = ifelse(df_ped$polygenicY_dementia > 0, 1, 0)
+    #   df_ped$Y_dementia = ifelse(df_ped$Y_dementia_other + df_ped$mendel_dem_Y + df_ped$Y_FTD > 0, 1, 0) 
+
+    #   # age and year of onset if Y = 1
+    #   # Age of onset for ALS
+    #   df_ped$age_ALS = ifelse(df_ped$mendel_ALS_Y_common == 1, df_ped$age_mendel_ALS_Y_common,
+    #                         ifelse(df_ped$mendel_ALS_Y_patho == 1, df_ped$age_mendel_ALS_Y_patho,
+    #                                ifelse(df_ped$polygenicY_ALS == 1, df_ped$age_polygenicY_ALS, NA)))
+    #   df_ped$year_onset_ALS = ifelse(df_ped$Y_ALS == 1 & !is.na(df_ped$age_ALS), df_ped$yob + df_ped$age_ALS, NA)
+
+    #   # Age of onset for FTD
+    #   df_ped$age_FTD = ifelse(df_ped$mendel_FTD_Y_common == 1, df_ped$age_mendel_FTD_Y_common,
+    #                         ifelse(df_ped$mendel_FTD_Y_patho == 1, df_ped$age_mendel_FTD_Y_patho,
+    #                                ifelse(df_ped$mendel_FTD_Y_ftd == 1, df_ped$age_mendel_FTD_Y_ftd,
+    #                                       ifelse(df_ped$polygenicY_FTD == 1, df_ped$age_polygenicY_FTD, NA))))
+    #   df_ped$year_onset_FTD = ifelse(df_ped$Y_FTD == 1 & !is.na(df_ped$age_FTD), df_ped$yob + df_ped$age_FTD, NA)
+
+    #   # Age of onset for overall dementia (FTD or other)
+    #   df_ped$age_dementia = ifelse(df_ped$Y_FTD == 1, df_ped$age_FTD,
+    #                             ifelse(df_ped$mendel_dem_Y_common == 1, df_ped$age_mendel_dem_Y_common,
+    #                               ifelse(df_ped$mendel_dem_Y_patho == 1, df_ped$age_mendel_dem_Y_patho,
+    #                                 ifelse(df_ped$polygenicY_dementia == 1, df_ped$age_polygenicY_dementia, NA))))
+    #   df_ped$year_onset_dementia = ifelse(df_ped$Y_dementia == 1 & !is.na(df_ped$age_dementia), 
+    #                                     df_ped$yob + df_ped$age_dementia, NA)
+
+    #   df_ped = df_ped %>%
+    #     rowwise() %>%
+    #     mutate(
+    #       post_surv_ALS = ifelse(Y_ALS == 1 & !is.na(age_ALS), sample_survival_ALS(), NA_real_),
+    #       post_surv_FTD = ifelse(Y_FTD == 1 & !is.na(age_FTD), sample_survival_FTD(), NA_real_),
+    #       post_surv_dem = ifelse(Y_dementia == 1 & Y_FTD == 0 & !is.na(age_dementia), sample_survival_dem(age_dementia), NA_real_),    
+    #       # Compute possible censoring times
+    #       censor_ALS = ifelse(!is.na(age_ALS) & !is.na(post_surv_ALS), age_ALS + post_surv_ALS, NA_real_),
+    #       censor_FTD = ifelse(!is.na(age_FTD) & !is.na(post_surv_FTD), age_FTD + post_surv_FTD, NA_real_),
+    #       censor_dem = ifelse(!is.na(age_dementia) & !is.na(post_surv_dem), age_dementia + post_surv_dem, NA_real_),
+    #       # Take the minimum of all non-NA censoring times
+    #       age_censored_updated = min(c(age_censored, censor_ALS, censor_FTD, censor_dem), na.rm = TRUE)
+    #     ) %>%
+    #     ungroup()
+
+    #   df_ped$age_censored <- df_ped$age_censored_updated
+
+    #   # Update phenotypes depending on the update age_censored;
+    #   # Recalculate phenotypes after updating age_censored
+    #   df_ped = df_ped %>%
+    #     rowwise() %>%
+    #     mutate(
+    #       mendel_ALS_Y_common = ifelse(!is.na(age_mendel_ALS_Y_common) & age_mendel_ALS_Y_common <= age_censored, 1, 0),
+    #       mendel_ALS_Y_patho  = ifelse(!is.na(age_mendel_ALS_Y_patho)  & age_mendel_ALS_Y_patho  <= age_censored, 1, 0),
+    #       mendel_ALS_Y = ifelse(mendel_ALS_Y_common + mendel_ALS_Y_patho > 0, 1, 0),
+    #       polygenicY_ALS = ifelse(!is.na(age_polygenicY_ALS) & age_polygenicY_ALS <= age_censored, 1, 0),
+    #       Y_ALS = ifelse(polygenicY_ALS + mendel_ALS_Y > 0, 1, 0),
+
+    #       mendel_FTD_Y_common = ifelse(!is.na(age_mendel_FTD_Y_common) & age_mendel_FTD_Y_common <= age_censored, 1, 0),
+    #       mendel_FTD_Y_patho  = ifelse(!is.na(age_mendel_FTD_Y_patho)  & age_mendel_FTD_Y_patho  <= age_censored, 1, 0),
+    #       mendel_FTD_Y_ftd    = ifelse(!is.na(age_mendel_FTD_Y_ftd)    & age_mendel_FTD_Y_ftd    <= age_censored, 1, 0),
+    #       mendel_FTD_Y = ifelse(mendel_FTD_Y_common + mendel_FTD_Y_patho + mendel_FTD_Y_ftd > 0, 1, 0),
+    #       polygenicY_FTD = ifelse(!is.na(age_polygenicY_FTD) & age_polygenicY_FTD <= age_censored, 1, 0),
+    #       Y_FTD = ifelse(polygenicY_FTD + mendel_FTD_Y > 0, 1, 0),  
+        
+    #       mendel_dem_Y_common = ifelse(!is.na(age_mendel_dem_Y_common) & age_mendel_dem_Y_common <= age_censored, 1, 0),
+    #       mendel_dem_Y_patho  = ifelse(!is.na(age_mendel_dem_Y_patho)  & age_mendel_dem_Y_patho  <= age_censored, 1, 0),
+    #       mendel_dem_Y = ifelse(mendel_dem_Y_common + mendel_dem_Y_patho > 0, 1, 0),
+    #       polygenicY_dementia = ifelse(!is.na(age_polygenicY_dementia) & age_polygenicY_dementia <= age_censored, 1, 0),
+    #       Y_dementia_other = ifelse(polygenicY_dementia > 0, 1, 0),
+    #       Y_dementia = ifelse(Y_dementia_other + mendel_dem_Y + Y_FTD > 0, 1, 0)
+    #     ) %>%
+    #     ungroup()
+      
     #   return(df_ped)
     # }
 
-wrapper function to simulate full pedigree
+### Wrapper function to simulate full pedigree
 
 ``` r
 print(sim_ped)
 ```
 
-sim_ped = function(i, k, lambda=NA, yob_index=1960, mean_gen_yr, fert_rate, disease_onset,
+    #   sim_ped = function(i, k, lambda=NA, yob_index=1960, mean_gen_yr, fert_rate, disease_onset,
     #                    DAF_common, DAF_patho, DAF_ftd, penetrance_ALS_common, penetrance_ALS_patho, 
     #                    K_ALS, h2_ALS, penetrance_FTD_common, penetrance_FTD_patho, penetrance_FTD_nonALS, K_FTD, h2_FTD, 
     #                    penetrance_dem_common, penetrance_dem_patho, K_dementia, h2_dementia, rg_ALSFTD, rg_ALSdem, rg_FTDdem, 
@@ -539,9 +652,9 @@ sim_ped = function(i, k, lambda=NA, yob_index=1960, mean_gen_yr, fert_rate, dise
     #   return(core_ped)
     # }
 
-## step-wise simulation with plots
+## Step-wise simulation with plots
 
-step 0. Define parameters:
+### Step 0. Define parameters:
 
 ``` r
 # Demographic parameters
@@ -579,7 +692,7 @@ rg_ALSdem = 0.25 # vRheenen 2021, Wainberg 2023, Chen 2024
 rg_FTDdem = 0.35 # vRheenen 2021, Chen 2024
 ```
 
-Step 1. simulate the core pedigree (with monogenic disease)
+### Step 1. simulate the core pedigree (with monogenic disease)
 
 ``` r
 core_ped = init_ped(DAF_common=DAF_common, DAF_patho=DAF_patho, DAF_ftd=DAF_ftd, k=k, yob_index=2010, mean_gen_yr=mean_gen_yr, life_expectancy=life_expectancy, current_year=current_year)
@@ -607,8 +720,7 @@ dev.off()
 
 ![](intro_simPed_files/figure-gfm/step1_core_pedigree-1.png)<!-- -->
 
-step 2. Simulate the inlaws, ancestors of the spouses married into this
-pedigree
+### Step 2. Simulate the inlaws, ancestors of the spouses married into this pedigree
 
 ``` r
 core_ped = add_inlaws(core_ped, DAF_common=DAF_common, DAF_patho=DAF_patho, DAF_ftd=DAF_ftd, mean_gen_yr=mean_gen_yr, life_expectancy=life_expectancy, current_year=current_year)
@@ -635,9 +747,9 @@ dev.off()
 
 ![](intro_simPed_files/figure-gfm/step2_inlaws-1.png)<!-- -->
 
-``` r
-# step 3. Simulate external branches, unlinked to founder
-```
+
+### Step 3. Simulate external branches, unlinked to founder
+
 
 ``` r
 core_ped = add_ext_branches(core_ped, lambda=lambda, k=k, DAF_common=DAF_common, DAF_patho=DAF_patho, DAF_ftd=DAF_ftd, fert_rate=fert_rate, mean_gen_yr=mean_gen_yr, 
@@ -664,9 +776,7 @@ dev.off()
 
 ![](intro_simPed_files/figure-gfm/step3_unlinked-1.png)<!-- -->
 
-``` r
-# step 4. Simulate phenotypes
-```
+### step 4. Simulate phenotypes
 
 ``` r
 core_ped = add_pheno(core_ped, disease_onset, penetrance_ALS_common, penetrance_ALS_patho, h2_ALS, K_ALS, penetrance_FTD_common, 
