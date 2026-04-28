@@ -9,31 +9,31 @@ This is a list of the subdirectories in our main github page:
   - Here, you'll find an interactive R script with an introductory explanation file
 - src:
   - This directory contains the main functions required to run all analyses. 
-  - Further subdirectories may contain adaptations of the main functions found in this src directory. 
+  - Further subdirectories contain adaptations of the main functions found in this src directory. 
 - varying_parameters:
   - This directory contains the files needed for the sensitivity analyses in our main article.
 - rationale:
   - This directory contains the data required to validate whether the simulations match input parameters, real world demographic data and if the simulations actually simulate phenotypic traits as is expected.
   - A separate README.md file is available for explanation on each rationale step.
 - data:
-  - This directory contains gathered and processed real world demographic and genetic data required to run the simulations.
+  - This directory contains gathered and processed real world demographic and genetic data required as input to run the simulations.
 - ALPINE_plug:
   - This directory contains a pipeline needed to run analyses on cryptic distant relatives in monogenic index patient pedigrees.
 
 ## Setup
 ### Snakefile
-**Snakemake** + **SLURM executor plugin** required for HPC execution.
+**Snakemake + SLURM executor plugin** required for HPC execution.
 
 #### Installation (Conda - Recommended)
 ```bash
 # Install snakemake + SLURM executor plugin
-conda create -n snakemake -c conda-forge -c bioconda snakemake snakemake-executor-plugin-slurm
-conda activate snakemake
+conda create -n simplex_snakemake -c conda-forge -c bioconda snakemake snakemake-executor-plugin-slurm
+conda activate simplex_snakemake
 ```
 
 #### Run Pipeline (Login Node Only)
 ```bash
-conda activate snakemake
+conda activate simplex_snakemake
 
 # This commnand can be applied for all snakefiles in this github; change the -s {snakefile_name} to the correct name where necessary for parallelization
 snakemake -s snakefile --executor slurm --jobs 500 \

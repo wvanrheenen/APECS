@@ -1,92 +1,121 @@
-simPed: a simulation scheme for pedigrees with Mendelian and complex
-traits
+# SimPlex
+
+A framework to simulate ALS and ALS-associated disease under a monogenic/Mendelian and polygenic/complex disease model.
+
 ================
-Wouter van Rheenen
-02 January 2025
+Wouter van Rheenen, Paul Beele
+23 april 2026
 
 ## General outline of simulation scheme
 
 ### Simulating family members:
 
 The pedigree consists of core pedigree (C) with one single founder this
-is initiated by function `init_ped()`.
+is initiated by function `init_ped()`. The birthyear of each founder is selected
+by taking the birthyear of the final `k`th generation and sampling `k` times
+from a normal distibution with mean = 30, truncated at 25 to 35 years back. 
 
 Then offspring generation will be simulated using the `add_gen()`
-function, IDs start with “C” and number reflects order of offspring
-(C0_0 for oldest, C0_1 for second child) in third generation offspring
-of oldest is denoted as C0_0\_\[0-9\] and second C0_1\_\[0-9\] etc.
-etc.. Therefore, all individuals in this lineage IDs can be traced to
-founder. The `add_gen()` function starts with simulating the spouse. The
-number of offspring is samles from a Poisson distribution with mean
-number of offspring $\lambda =$ `lambda`. The spouses married into this
-pedigree are denoted with “P\*” and have same code as partner (P_0_0 for
-partner of firs child in generation 2). The number of generations to be
-added is defined by `k`, so for `k=2` a three-generation pedigree is
+function, IDs start with “C” and the number reflects order of offspring
+(C0_1 for oldest, C0_2 for second child). In the third generation offspring
+of the oldest is denoted as C0_1\_\[0-9\] and second C0_2\_\[0-9\] etc.
+etc... This way, all individuals in this lineage IDs can be traced to
+founder. 
+
+The `add_gen()` function starts with simulating the spouse. The
+number of offspring is sampled from a negative binomial distribution with mean
+number of offspring $\lambda =$ `lambda` or, if available, mean fertility provided
+by demographic data, based on the birthyear of the offspring. To guarantee 
+offspring of the "core pedigree" (i.e. individuals in the lineage whose 
+ID starts with 'C'), we force at least one of offspring for the eldest child
+in each generation of the core pedigree member. 
+
+The spouses married into this pedigree are denoted with “P\*” and have same code as partner 
+(P0_1 for partner of first child in generation 1). The number of generations
+to be added is defined by `k`, so for `k=2` a three-generation pedigree is
 simulated.
 
 When all generations of core pedigree are simulated, we simulate the
 in-laws e.g. the ancestors of the married in spouses (P\*) using the
-`add_inlaws()` function.
+`add_inlaws()` function. To complete the pedigree, we simulate offspring 
+of the inlaws using `add_ext_branches()`. These individuals are unlinked
+to the core pedigree, e.g. sibs, cousins, etc. of the spouses married 
+into this pedigree.
 
-To complete the pedigree, we simulate offspring of the inlaws using
-`add_ext_branches()`. These individuals are unlinked to the core
-pedigree, e.g. sibs, cousins, etc. of the spouses married in to this
-pedigree.
+### Simulating demographic data:
+For each individual, we sample a life expectancy from a left-skewed
+normal distribution, with the mean life expectancy based on demographic
+life expectancies for an individuals year of birth. 
+
+At this point in the simulation, we first assess if the if the individual
+is either alive or dead based on whether the `current year` of the simulation
+lies before or after the year where an individual is simulated to decease,
+based on their life expectancy. 
 
 ### Genetics and phenotypes
 
 #### Mendelian disease alleles
 
-The founder of the core pedigree can be defined to carry a pathogenic
-mutation, when `init_ped(monogenic=TRUE)` is used. For now, this disease
-allele is autosomal, so probability of transmission is 0.5. For spouses
-married into this pedigree, the probability of carrying the disease
-allele is defined by the disease-allele frequency (`DAF`). Note, disease
-alleles introduced by spouses can be transmitted in the core pedigree as
-well. This can be prevented by setting `DAF=0`.
+We simulated carriership of pathogenic mutations based no disease allele
+frequencies. We simulated an ALS-FTD common (C9orf72-like) and rare but more
+pathogenic (FUS/SOD1-like) disease allele, and an FTD-specific (GRN/MAPT-like)
+disease allele. In the `init_ped` function, the probability of carrying 
+the disease allele is defined by the disease-allele frequency (`DAF`) 
+and determined via Bernoulli sampling. 
 
-The probability of developing the disease is defined by the
-disease-allele penetrance `penetrance`. Therefore, the disease is
-modeled to be autosomal dominant with or without reduced penetrance.
+For spouses in the `add_gen` function, the probability of carrying the 
+disease allele is also determined via Bernoulli sampling. When generating offspring
+in the `add_gen` function, this disease allele is autosomal, so probability 
+of transmission is 0.5, sampled from either parent's disease alleles. 
+In the `add_inlaws` function, when sampling parents, one of their alleles 
+is based on the already simulated offsprings disease alleles. 
+
+If an individual carries the disease allele, we used the cumulative, lifetime 
+penetrance of a disease to sample whether the individual developed disease. The
+age at which an individual developed disease and handling of competing mortality 
+is handled in the following paragraphs. 
 
 #### Polygenic model
 
 The general polygenic model is defined by $P = G + E$ where the
 phenotypic value ($P$) is the sum of a genetic value ($G$) and
-non-genetic value ($E$). The phenotypic value $P$ is standardized to
-zero mean and unit variance and thus follows $N(0,1)$. The heritabiliy
-($h^2$), defined as the proportion of phenotypic variance ($V_p$)
-explained by additive genetic variance. The non-genetic component has
-variance $1 - h^2$ by definition.
+non-genetic value ($E$). The total phenotypic variance is standardized
+to 1, with heritability ($h^2$) defining the proportion of variance explained
+by genetic effects. The residual variance is defined as $1 - h^2$.
 
-For a founder $G$ can be drawn from $N(0,h^2)$. For offspring of parents
-$p$ and $m$ with genetic values of $G_p$ and $G_m$ respectively
-$G_{offspring} ~ N(\frac{G_p + G_m}{2},\frac{1}{2}h^2)$ of small
-pedigree G can be simulated using a multivariate normal distribution.
-This requires looping through all offspring which can be slow.
-Alternatively, for simulating a large number of small pedigrees up to
-four generations, G can be simulating from a multivariate normal
-distribution (`MASS::mvrnorm()` or `mvnfast::rmvn()`) where the
-variance-covariance matrix is defined as $2\textbf{K}h^2$ where
-$\textbf{K}$ is the kinship matrix of the pedigree `ped` obtained
-through `ribd::kinship(ped)`. Once $G$ is simulated, $E$ is assigned
-from $N(0,1-h^2)$. Once $P$ is simulated, disease status is defined by
-the liability threshold model, where the threhold $t$ is defined such
-that $\Phi_p$, the area under the tail of the standard normal
-distribution from $t$ is the population life-time risk $K$. Note, $K$ is
-defined by the user. Subsequently, when for one individual $P > t$
-disease status is defined as affected.
+For founders, genetic values for correlated traits (ALS, FTD, and dementia)
+are sampled jointly from a multivariate normal distribution: 
+$$ \mathbf{G}_{founder} \sim N(\mathbf{0}, \mathbf{V}_g) $$
 
-Equation for heritability sanity check:
+where $\mathbf{V}_g$ is the covariance matrix constructed from trait 
+heritabilities and their pairwise genetic correlations ($rg$). 
+
+For non-founders, genetic values are simulated conditional on parental values 
+($G_p, G_m$). The offspring mean is the mid-parent value, and the variance is 
+$0.5 \times h^2$ per trait. Offspring values are drawn from a multivariate 
+normal distribution to maintain specified trait correlations:
+$$
+\mathbf{G}_{offspring} \sim N\left(\frac{\mathbf{G}_p + \mathbf{G}_m}{2}, \mathbf{V}_{g, offspring}\right)
+$$
+where $\mathbf{V}_{g, offspring}$ uses the same correlation structure but 
+scaled to reflect the reduction in variance due to segregation ($0.5 \times h^2$). 
+Environmental components are subsequently assigned as $E \sim N(0, 1 - h^2)$.
+
+Disease status is determined by the liability threshold model. For each trait,
+the individual liability $P$ is compared to a lifetime-risk threshold ($t$), defined as:
+$$
+t = -\text{qnorm}(K)
+$$
+where $K$ is the population lifetime risk. If $P > t$, the individual is assigned 
+an age at onset—if this occurs before their age at censoring, they are classified as affected. 
+
 
 Limitations to polygenic model:
-
 - Shared environment between relatives is not modeled
-
 - There is no assortative mating
+- Heritability is additive, there is no epistasis/dominance 
 
-- Heritability is additive, there is no epistasis/dominance \## R code
-  and functions.
+\## R code and functions.
 
 ``` r
 source("src/libraries_simPed.R")
