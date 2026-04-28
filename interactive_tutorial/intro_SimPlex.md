@@ -84,13 +84,13 @@ non-genetic value ($E$). The total phenotypic variance is standardized
 to 1, with heritability ($h^2$) defining the proportion of variance explained
 by genetic effects. The residual variance is defined as $1 - h^2$.
 
-For founders, genetic values for correlated traits (ALS, FTD, and dementia)
-are sampled jointly from a multivariate normal distribution: 
+For founders, genetic values for correlated traits (ALS, FTD, and dementia) are sampled jointly from a multivariate normal distribution:
+
 $$
 \mathbf{G}_{founder} \sim N(\mathbf{0}, \mathbf{V}_g)
 $$
-is the covariance matrix constructed from trait heritabilities and their 
-pairwise genetic correlations ($rg$). 
+
+Here, $\mathbf{V}_g$ is the covariance matrix constructed from trait heritabilities and their pairwise genetic correlations ($rg$).
 
 For non-founders, genetic values are simulated conditional on parental values 
 ($G_p, G_m$). The offspring mean is the mid-parent value, and the variance is 
