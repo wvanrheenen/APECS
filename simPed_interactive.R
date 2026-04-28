@@ -78,7 +78,7 @@ ped_plt2 = ped(id = core_ped$id,
 carriers = filter(core_ped, (a1_common + a2_common + a1_patho + a2_patho) > 0)$id
 color = ifelse(ped_plt2$ID %in% ped_plt1$ID, "white", "lightgray")
 
-plot(ped_plt2, title="step 2 - simulated the in-laws", cex=1.5, carrier = carriers, fill=color)
+plot(ped_plt2, title="Step 2 - simulated the in-laws", cex=1.5, carrier = carriers, fill=color)
 
 png("step2_inlaws.png", width=400, height=400)  # Adjust size and resolution as needed
 plot(

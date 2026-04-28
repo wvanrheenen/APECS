@@ -75,7 +75,6 @@
 #' 
 #' * Heritability is additive, there is no epistasis/dominance
 
-
 #' ## R code and functions.
 source("src/libraries_simPed.R")
 source("src/functions_simPed.R")
