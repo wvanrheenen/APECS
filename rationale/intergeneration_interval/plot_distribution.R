@@ -55,7 +55,6 @@ print(summary_stats)
 # Define Darjeeling1 palette (MISSING in your code)
 darjeeling_cols <- wes_palette("Darjeeling1", 5)
 
-
 # Save plot to PNG (same style as your life expectancy plot)
 p <- ggplot(simulated_intervals, aes(x = simulated_interval)) +
   geom_density(linewidth = 1.2, fill = darjeeling_cols[1], alpha = 0.3, color = darjeeling_cols[1]) +
