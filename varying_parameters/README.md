@@ -25,20 +25,19 @@ patients to analyse the fALS criteria.
     - We run the analyses as if the polygenic ALS had a mean onset 10 years earlier/
     later then in the literature estimates
     - In the main analysis, the polygenic ALS has a later onset than polygenic disease
-
-![](../rationale/disease_onset/historical_disease_onset_9x3.pdf)<!-- -->
+    - See: [historical_disease_onset_9x3.pdf](../rationale/disease_onset/historical_disease_onset_9x3.pdf)
 
 - fert_rate
     - We run the analyses with a set fertility rate for all individuals, ranging 1-5 offspring per mother
     - In the main analysis, the fertility rate was year-of-offspring dependent. Historically, 
     people used to have more offspring in the past then in recent years, resulting in bigger pedigrees
     in the past
-
-![](../rationale/fertility_rate/simulated_fertility_rate.pdf)<!-- -->
+    - See: [simulated_fertility_rate.pdf](../rationale/fertility_rate/simulated_fertility_rate.pdf)
 
 - life_exp
     - We run the analyses with a set life expectancy for all individuals, ranging 50 to 100 years for all individuals
     - In the main analysis, the life expectancy was year-of-birth dependent. Historically, 
     the life expectancy has increased in recent years, giving individuals who were to be disease-affected more 'chance' to actually develop the phenotype as they were to get older. 
+    - See: [simulated_life_expectancy_comparison.pdf](../rationale/life_expectancy/simulated_life_expectancy_comparison.pdf)
 
-![](../rationale/life_expectancy/simulated_life_expectancy_comparison.pdf) <!-- -->
+## Rest of varying params will follow 
