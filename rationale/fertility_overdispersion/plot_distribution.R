@@ -1,47 +1,63 @@
-# Script to plot theoretical Negative Binomial offspring distributions
-# Matches your exact 9x3 boxplot publication style
-
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(wesanderson)
 
+# Link to data for mean fert rate based on birth year
+fert_rate = read.table("../../data/fertility_rate/Gapminder/GM_fertility_rate_Netherlands_1800_2100.txt", header=T)
+
+# Parameters
+years_keep <- c(1900, 1950, 2000)
+
+fr_sel <- fert_rate %>%
+  filter(year %in% years_keep) %>%
+  arrange(match(year, years_keep))
+
+fertility_rate <- fr_sel$mean_fertility
+year_labels <- as.character(fr_sel$year)
+
 max_offspring <- 15
-means <- c(2.5)
-sizes <- c(1, 3, 5)
+sizes <- 5
 
 # Create NB data
 plot_data <- data.frame()
+colors <- wes_palette(n = length(fertility_rate), name = "Darjeeling1")
 
-for (m in means) {
-  for (s in sizes) {
-    offspring <- 0:max_offspring
-    prob <- dnbinom(offspring, size = s, mu = m)
-    temp_df <- data.frame(
-      offspring = offspring,
-      mean = m,
-      size = s,
-      prob = prob
-    )
-    plot_data <- rbind(plot_data, temp_df)
-  }
+for (i in seq_along(fertility_rate)) {
+  m <- fertility_rate[i]
+  offspring <- 0:max_offspring
+  prob <- dnbinom(offspring, size = sizes, mu = m)
+
+  temp_df <- data.frame(
+    offspring = offspring,
+    mean = m,
+    year = year_labels[i],
+    prob = prob
+  )
+
+  plot_data <- rbind(plot_data, temp_df)
 }
 
 plot_data <- plot_data %>%
   mutate(
-    size_label = factor(size, levels = c(1, 3, 5)),
-    facet_label = paste("Mean Fertility =", mean)
+    year_label = factor(year, levels = year_labels)
   ) %>%
   filter(prob > 1e-4)
 
-# 2x2 grid layout - perfect square format
-p <- ggplot(plot_data, aes(x = offspring, y = prob, color = size_label)) +
+# Plot lines for each fertility year
+p <- ggplot(plot_data, aes(x = offspring, y = prob, color = year_label)) +
   geom_line(size = 1, alpha = 0.9) +
-  facet_wrap(~ facet_label, nrow = 2, ncol = 2, scales = "free") +  # ← 2x2 grid
-  scale_color_manual(values = wes_palette("Darjeeling1"), name = "NegBin size") +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +  
-  labs(title = "(C) Negative Binomial Fertility Rate Distributions",
-       x = "Number of Offspring", y = "Density") +
+  scale_color_manual(
+    values = colors,
+    name = "Year of birth",
+    labels = year_labels
+  ) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+  labs(
+    title = "(B) Negative Binomial Fertility Rate Distributions",
+    x = "Number of Offspring",
+    y = "Density"
+  ) +
   theme_bw() +
   theme(
     legend.position = "top",
@@ -53,13 +69,10 @@ p <- ggplot(plot_data, aes(x = offspring, y = prob, color = size_label)) +
     axis.text.x = element_text(color = "black"),
     axis.text.y = element_text(color = "black"),
     axis.ticks = element_line(color = "black"),
-    strip.background = element_rect(fill = "grey90", color = "black"),
     plot.margin = unit(c(5,5,5,5), "pt"),
     panel.grid.minor = element_blank()
   )
 
-# Square 2x2 format - adjust dimensions for balance
-ggsave("nb_fertility_distributions.pdf", p, width = 4.5, height = 3, units = "in", dpi = 300)
+ggsave("nb_fertility_distributions.pdf", p, width = 3, height = 3, units = "in", dpi = 300)
 
-cat("✓ nb_fertility_distributions.pdf (2x2 grid, 8x8 square)\n")
-cat("✓ Wes Anderson Darjeeling1 + exact publication theme\n")
+cat("✓ nb_fertility_distributions.pdf - FIXED legend shows correct years ✓\n")

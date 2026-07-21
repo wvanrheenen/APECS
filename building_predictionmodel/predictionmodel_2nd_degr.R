@@ -182,7 +182,7 @@ evaluate_glm_model <- function(model, data, model_name = "GLM Model") {
 }
 
 #load file from last full simulation 18 march
-results_df <- read.csv("../results/trainingset/combined_simulations.csv")
+results_df <- read.csv("../results/testset/combined_simulations.csv")
 
 ## Step 0: preparation of data, so they fit nicely in the model
 ## Calculated unaffected individuals per degree, per affected disease
@@ -602,7 +602,7 @@ evaluate_cv_glm_model(model_cv_dementia, model_name = "ALS + Dementia model incl
 # ## PART 3; testing the cross-validated trained models on newly simulated testing data
 
 # # Load new data
-new_data <- read.csv("../results/testset/combined_simulations.csv")
+new_data <- read.csv("../results/phenocopies/combined_simulations.csv")
 
 new_data$relatives_1st_unaffected <- new_data$relatives_1st - new_data$relatives_1st_als
 new_data$relatives_2nd_unaffected <- new_data$relatives_2nd - new_data$relatives_2nd_als

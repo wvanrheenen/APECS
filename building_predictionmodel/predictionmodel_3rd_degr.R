@@ -182,7 +182,7 @@ evaluate_glm_model <- function(model, data, model_name = "GLM Model") {
 }
 
 #load file from last full simulation 
-results_df <- read.csv("../results/trainingset/combined_simulations.csv")
+results_df <- read.csv("../results/testset/combined_simulations.csv")
 
 ## Step 0: preparation of data, so they fit nicely in the model
 ## Calculated unaffected individuals per degree, per affected disease
@@ -418,8 +418,8 @@ cat("ROC plots saved as 4x4 PDFs with Darjeeling1 Wes Anderson palette\n")
 combined_roc_plot <- wrap_plots(roc_plot1, roc_plot2, roc_plot3, ncol = 3) +
   plot_layout(widths = c(0.8, 0.8, 1)) +
   plot_annotation(
-    title = "Supplementary Figure 6: ROC curves for monogenic ALS prediction",
-    subtitle = "Stepwise effects of including more distant relatives, FTD/dementia, and unaffected individuals",
+    # title = "Supplementary Figure 3: ROC curves for monogenic ALS prediction",
+    # subtitle = "Stepwise effects of including more distant relatives, FTD/dementia, and unaffected individuals",
     theme = theme(
       plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
       plot.subtitle = element_text(size = 10, hjust = 0.5)
@@ -624,7 +624,7 @@ evaluate_cv_glm_model(model_cv_dementia, model_name = "ALS + Dementia model incl
 # ## PART 3; testing the cross-validated trained models on newly simulated testing data
 
 # # Load new data
-new_data <- read.csv("../results/testset/combined_simulations.csv")
+new_data <- read.csv("../results/phenocopies/combined_simulations.csv")
 
 new_data$relatives_1st_unaffected <- new_data$relatives_1st - new_data$relatives_1st_als
 new_data$relatives_2nd_unaffected <- new_data$relatives_2nd - new_data$relatives_2nd_als
@@ -722,7 +722,7 @@ get_caret_model_metrics <- function(caret_model, new_data, outcome_col = "mendel
 }
 
 # Evaluate all models on new data (assuming model_list and new_data exist)
-thresholds <- seq(0.10, 0.85, by = 0.025)
+thresholds <- seq(0.10, 0.90, by = 0.025)
 
 metrics_list <- lapply(model_list, function(mod) {
   # For each model, evaluate at all thresholds
@@ -865,8 +865,8 @@ if (!dir.exists("roccurves_testset")) dir.create("roccurves_testset")
 
 roc_plot_testset <- plot_roc_curves(
   roc_list, 
-  title = "Supplementary Figure 7: Monogenic ALS prediction model",
-  subtitle = "Accuracy performance on main simulation",
+  # title = "Supplementary Figure 4: Monogenic ALS prediction model",
+  # subtitle = "Accuracy performance on main simulation",
   model_labels = model_labels) +
   guides(color = guide_legend(nrow = 2, byrow = TRUE))
 

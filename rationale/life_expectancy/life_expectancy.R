@@ -87,7 +87,7 @@ historical_data = life_expectancy %>%
   dplyr::select(yob, historical_life_expectancy)
 
 # Save plot to PNG
-pdf("simulated_life_expectancy_comparison.pdf", height = 3, width = 4.5)
+pdf("simulated_life_expectancy_comparison.pdf", height = 3, width = 3)
 p <- ggplot() +
   stat_summary(data = life_expectancy_estimates, 
                aes(x = yob, y = simulated_life_expectancy, color = "Simulated"),
@@ -95,7 +95,7 @@ p <- ggplot() +
   geom_line(data = historical_data, 
             aes(x = yob, y = historical_life_expectancy, color = "Historical")) +
   scale_x_continuous(breaks = c(1850, 1900, 1950, 2000, 2050)) +
-  labs(title = "(D) Historical vs. simulated life expectancy",
+  labs(title = "(A) Historical vs. simulated life expectancy",
        x = "Year of Birth", y = "Life Expectancy") +
   scale_color_manual(values = wes_palette(n = 2, name = "Darjeeling1"),
                      name = "Data") +

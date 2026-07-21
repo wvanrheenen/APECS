@@ -1,5 +1,5 @@
 # Get the script's path
-options( warn = 2 )
+options( warn = 1 )
 source("src/libraries_simPed.R")
 
 ## ANALYSES
@@ -93,13 +93,21 @@ define_scenarios_1_9 <- function(results_df) {
     "9.1) ≥5 1st/2nd ALS/FTD" = results_df$relatives_1st_als + results_df$relatives_2nd_als + results_df$relatives_1st_ftd_unique + results_df$relatives_2nd_ftd_unique >= 5,
     "9.2) ≥5 1st/2nd/3rd ALS" = results_df$relatives_1st_als + results_df$relatives_2nd_als + results_df$relatives_3rd_als >= 5,
     "9.3) ≥5 1st/2nd/3rd ALS/FTD" = results_df$relatives_1st_als + results_df$relatives_2nd_als + results_df$relatives_3rd_als + 
-                                    results_df$relatives_1st_ftd_unique + results_df$relatives_2nd_ftd_unique + results_df$relatives_3rd_ftd_unique >= 5
+                                    results_df$relatives_1st_ftd_unique + results_df$relatives_2nd_ftd_unique + results_df$relatives_3rd_ftd_unique >= 5,
+    "Byrne (A): 1 1st degree relative ALS" = results_df$relatives_1st_als == 1 & results_df$relatives_2nd_als == 0, # + results_df$relatives_3rd_als == 0,
+    "Byrne (B): 1 1st/2nd degree relative ALS" = results_df$relatives_1st_als + results_df$relatives_2nd_als == 1, # & results_df$relatives_3rd_als == 0,
+    "Byrne (C): ≥2 1st/2nd degree relative ALS" = results_df$relatives_1st_als + results_df$relatives_2nd_als >= 2,
+    "Questionnaire (A): 1 parent with ALS" = results_df$relatives_1st_als == 1 & results_df$relatives_2nd_als == 0 & results_df$relatives_3rd_als == 0,
+    "Questionnaire (B): 1 parent and 1 uncle with ALS" = results_df$relatives_1st_als == 1 & results_df$relatives_2nd_als == 1 & results_df$relatives_3rd_als == 0,
+    "Questionnaire (C): 1 uncle with ALS" = results_df$relatives_1st_als == 0 & results_df$relatives_2nd_als == 1 & results_df$relatives_3rd_als == 0,
+    "Questionnaire (D): 1 grandparent with ALS" = results_df$relatives_1st_als == 0 & results_df$relatives_2nd_als == 1 & results_df$relatives_3rd_als == 0,
+    "Questionnaire (E): 1 uncle and 1 grandparent" = results_df$relatives_1st_als == 0 & results_df$relatives_2nd_als == 2 & results_df$relatives_3rd_als == 0
   )
   
   return(scenarios_1_9)
 }
 
-# Define scenarios 1.0 to 6.3
+# Define scenarios 1.0 to 9.3 and article examples
 scenarios_1_9 <- list(
     "1.1) ≥1 1st ALS" = results_df$relatives_1st_als >= 1,
     "1.2) ≥1 1st/2nd ALS" = results_df$relatives_1st_als + results_df$relatives_2nd_als >= 1,
@@ -134,8 +142,16 @@ scenarios_1_9 <- list(
     "9.1) ≥5 1st/2nd ALS/FTD" = results_df$relatives_1st_als + results_df$relatives_2nd_als + results_df$relatives_1st_ftd_unique + results_df$relatives_2nd_ftd_unique >= 5,
     "9.2) ≥5 1st/2nd/3rd ALS" = results_df$relatives_1st_als + results_df$relatives_2nd_als + results_df$relatives_3rd_als >= 5,
     "9.3) ≥5 1st/2nd/3rd ALS/FTD" = results_df$relatives_1st_als + results_df$relatives_2nd_als + results_df$relatives_3rd_als + 
-                                    results_df$relatives_1st_ftd_unique + results_df$relatives_2nd_ftd_unique + results_df$relatives_3rd_ftd_unique >= 5
-)
+                                    results_df$relatives_1st_ftd_unique + results_df$relatives_2nd_ftd_unique + results_df$relatives_3rd_ftd_unique >= 5,
+    "Byrne (A): 1 1st degree relative ALS" = results_df$relatives_1st_als == 1 & results_df$relatives_2nd_als == 0, # + results_df$relatives_3rd_als == 0,
+    "Byrne (B): 1 1st/2nd degree relative ALS" = results_df$relatives_1st_als + results_df$relatives_2nd_als == 1, # & results_df$relatives_3rd_als == 0,
+    "Byrne (C): ≥2 1st/2nd degree relative ALS" = results_df$relatives_1st_als + results_df$relatives_2nd_als >= 2,
+    "Questionnaire (A): 1 parent with ALS" = results_df$relatives_1st_als == 1 & results_df$relatives_2nd_als == 0 & results_df$relatives_3rd_als == 0,
+    "Questionnaire (B): 1 parent and 1 uncle with ALS" = results_df$relatives_1st_als == 1 & results_df$relatives_2nd_als == 1 & results_df$relatives_3rd_als == 0,
+    "Questionnaire (C): 1 uncle with ALS" = results_df$relatives_1st_als == 0 & results_df$relatives_2nd_als == 1 & results_df$relatives_3rd_als == 0,
+    "Questionnaire (D): 1 grandparent with ALS" = results_df$relatives_1st_als == 0 & results_df$relatives_2nd_als == 1 & results_df$relatives_3rd_als == 0,
+    "Questionnaire (E): 1 uncle and 1 grandparent" = results_df$relatives_1st_als == 0 & results_df$relatives_2nd_als == 2 & results_df$relatives_3rd_als == 0
+  )
 
 # Function to create and print crosstab
 print_crosstab <- function(scenario, name, total_n = nrow(results_df)) {

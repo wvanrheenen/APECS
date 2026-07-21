@@ -74,9 +74,22 @@ prop_polygenic_sporadic <- sum(sporadic_index$polygenicY_ALS == 1) / nrow(sporad
 prop_monogenic_familial <- sum(familial_index$mendel_ALS_Y == 1) / nrow(familial_index)
 prop_polygenic_familial <- sum(familial_index$polygenicY_ALS == 1) / nrow(familial_index)
 
+# Count sums of affected relatives
+total_relatives           <- sum(combined_results$relatives_1st) + sum(combined_results$relatives_2nd) + sum(combined_results$relatives_3rd)
+total_relatives_als       <- sum(combined_results$relatives_1st_als) + sum(combined_results$relatives_2nd_als) + sum(combined_results$relatives_3rd_als)
+total_relatives_ftd       <- sum(combined_results$relatives_1st_ftd) + sum(combined_results$relatives_2nd_ftd) + sum(combined_results$relatives_3rd_ftd)
+total_relatives_dementia  <- sum(combined_results$relatives_1st_dementia) + sum(combined_results$relatives_2nd_dementia) + sum(combined_results$relatives_3rd_dementia)
+
 # PRINT RESULTS
 cat("=== SIMULATION SUMMARY ===\n")
 cat(sprintf("Total index patients: %d\n", n_total_index))
+
+cat(sprintf("\nTotal number of relatives: %d\n", total_relatives))
+cat(sprintf("\nTotal number of relatives with ALS: %d\n", total_relatives_als))
+cat(sprintf("\nTotal number of relatives with FTD: %d\n", total_relatives_ftd))
+cat(sprintf("\nTotal number of relatives with any dementia: %d\n", total_relatives_dementia))
+
+
 cat(sprintf("\n1) PROPORTION BY ETIOLOGY:\n"))
 cat(sprintf("   Monogenic: %.1f%% (%d/%d)\n", prop_monogenic_total*100, n_monogenic, n_total_index))
 cat(sprintf("   Polygenic: %.1f%% (%d/%d)\n", prop_polygenic_total*100, n_polygenic, n_total_index))
@@ -114,32 +127,90 @@ phenocopy_rate_1st <- ifelse(n_monogenic_index > 0, n_phenocopies_1st / n_monoge
 phenocopy_rate_2nd <- ifelse(n_monogenic_index > 0, n_phenocopies_2nd / n_monogenic_index, NA)
 phenocopy_rate_3rd <- ifelse(n_monogenic_index > 0, n_phenocopies_3rd / n_monogenic_index, NA)
 
+cat("\nPhenocopy rate as number of pedigrees with any phenocopy among total number of pedigrees:\n")
 cat("\nTotal monogenic index cases:", n_monogenic_index, "\n")
 cat("Pedigrees with phenocopies among them:", n_phenocopies, "\n")
-cat("Overall phenocopy rate:", round(phenocopy_rate, 4), "\n")
-cat("Phenocopy rate in 1st degree:", round(phenocopy_rate_1st, 4), "\n")
-cat("Phenocopy rate in 2nd degree:", round(phenocopy_rate_2nd, 4), "\n")
-cat("Phenocopy rate in 3rd degree:", round(phenocopy_rate_3rd, 4), "\n")
+cat(sprintf(
+  "Overall phenocopy rate: %.4f (%d/%d)\n",
+  phenocopy_rate, n_phenocopies, n_monogenic_index
+))
+cat(sprintf(
+  "Phenocopy rate in 1st degree: %.4f (%d/%d)\n",
+  phenocopy_rate_1st, n_phenocopies_1st, n_monogenic_index
+))
+cat(sprintf(
+  "Phenocopy rate in 2nd degree: %.4f (%d/%d)\n",
+  phenocopy_rate_2nd, n_phenocopies_2nd, n_monogenic_index
+))
+cat(sprintf(
+  "Phenocopy rate in 3rd degree: %.4f (%d/%d)\n",
+  phenocopy_rate_3rd, n_phenocopies_3rd, n_monogenic_index
+))
 
+# Total affected relatives per degree
 n_affected_relatives_1st_dgr <- sum(monogenic_index$relatives_1st_als)
-n_affected_relatives_1st_dgr_poly <- sum(monogenic_index$relatives_1st_als_polygenic)
 n_affected_relatives_2nd_dgr <- sum(monogenic_index$relatives_2nd_als)
-n_affected_relatives_2nd_dgr_poly <- sum(monogenic_index$relatives_2nd_als_polygenic)
 n_affected_relatives_3rd_dgr <- sum(monogenic_index$relatives_3rd_als)
-n_affected_relatives_3rd_dgr_poly <- sum(monogenic_index$relatives_3rd_als_polygenic)
 
-phenocopy_rate_relatives_1st <- ifelse(n_affected_relatives_1st_dgr > 0, n_affected_relatives_1st_dgr_poly / n_affected_relatives_1st_dgr, NA)
-phenocopy_rate_relatives_2nd <- ifelse(n_affected_relatives_2nd_dgr > 0, n_affected_relatives_2nd_dgr_poly / n_affected_relatives_2nd_dgr, NA)
-phenocopy_rate_relatives_3rd <- ifelse(n_affected_relatives_3rd_dgr > 0, n_affected_relatives_3rd_dgr_poly / n_affected_relatives_3rd_dgr, NA)
+# Phenocopy components per degree
+n_affected_relatives_1st_dgr_polygenic <- sum(monogenic_index$relatives_1st_als_polygenic)
+n_affected_relatives_1st_dgr_diff_ancestor <- sum(monogenic_index$relatives_1st_different_monogenic_ancestor)
 
+n_affected_relatives_2nd_dgr_polygenic <- sum(monogenic_index$relatives_2nd_als_polygenic)
+n_affected_relatives_2nd_dgr_diff_ancestor <- sum(monogenic_index$relatives_2nd_different_monogenic_ancestor)
 
-cat("\nTotal number of affected 1st degree relatives among monogenic index patients:", round(n_affected_relatives_1st_dgr, 4), "\n")
-cat("Total number of affected 2nd degree relatives among monogenic index patients:", round(n_affected_relatives_2nd_dgr, 4), "\n")
-cat("Total number of affected 3rd degree relatives among monogenic index patients:", round(n_affected_relatives_3rd_dgr, 4), "\n")
+n_affected_relatives_3rd_dgr_polygenic <- sum(monogenic_index$relatives_3rd_als_polygenic)
+n_affected_relatives_3rd_dgr_diff_ancestor <- sum(monogenic_index$relatives_3rd_different_monogenic_ancestor)
 
-cat("\nPhenocopy individuals among affected in 1st degree:", round(phenocopy_rate_relatives_1st, 4), "\n")
-cat("Phenocopy individuals among affected in 2nd degree:", round(phenocopy_rate_relatives_2nd, 4), "\n")
-cat("Phenocopy individuals among affected in 3rd degree:", round(phenocopy_rate_relatives_3rd, 4), "\n")
+# Total phenocopy counts per degree (polygenic + different-ancestor monogenic)
+n_affected_relatives_1st_dgr_phenocopy <- n_affected_relatives_1st_dgr_polygenic +
+  n_affected_relatives_1st_dgr_diff_ancestor
+
+n_affected_relatives_2nd_dgr_phenocopy <- n_affected_relatives_2nd_dgr_polygenic +
+  n_affected_relatives_2nd_dgr_diff_ancestor
+
+n_affected_relatives_3rd_dgr_phenocopy <- n_affected_relatives_3rd_dgr_polygenic +
+  n_affected_relatives_3rd_dgr_diff_ancestor
+
+# Phencopy rate as number of phencopies among number of affected relatives
+phenocopy_rate_relatives_1st <- ifelse(n_affected_relatives_1st_dgr > 0, n_affected_relatives_1st_dgr_phenocopy / n_affected_relatives_1st_dgr, NA)
+phenocopy_rate_relatives_2nd <- ifelse(n_affected_relatives_2nd_dgr > 0, n_affected_relatives_2nd_dgr_phenocopy / n_affected_relatives_2nd_dgr, NA)
+phenocopy_rate_relatives_3rd <- ifelse(n_affected_relatives_3rd_dgr > 0, n_affected_relatives_3rd_dgr_phenocopy / n_affected_relatives_3rd_dgr, NA)
+
+cat("\nPhenocopy rate as number of phencopies among number of affected relatives:\n")
+cat("\nTotal number of affected 1st degree relatives among monogenic index patients:",
+    n_affected_relatives_1st_dgr, "\n")
+cat("Total number of affected 2nd degree relatives among monogenic index patients:",
+    n_affected_relatives_2nd_dgr, "\n")
+cat("Total number of affected 3rd degree relatives among monogenic index patients:",
+    n_affected_relatives_3rd_dgr, "\n")
+
+cat(sprintf(
+  "\nPhenocopy individuals among affected in 1st degree: %.4f (%d/%d) [polygenic: %d, diff-ancestor monogenic: %d]\n",
+  phenocopy_rate_relatives_1st,
+  n_affected_relatives_1st_dgr_phenocopy,
+  n_affected_relatives_1st_dgr,
+  n_affected_relatives_1st_dgr_polygenic,
+  n_affected_relatives_1st_dgr_diff_ancestor
+))
+
+cat(sprintf(
+  "Phenocopy individuals among affected in 2nd degree: %.4f (%d/%d) [polygenic: %d, diff-ancestor monogenic: %d]\n",
+  phenocopy_rate_relatives_2nd,
+  n_affected_relatives_2nd_dgr_phenocopy,
+  n_affected_relatives_2nd_dgr,
+  n_affected_relatives_2nd_dgr_polygenic,
+  n_affected_relatives_2nd_dgr_diff_ancestor
+))
+
+cat(sprintf(
+  "Phenocopy individuals among affected in 3rd degree: %.4f (%d/%d) [polygenic: %d, diff-ancestor monogenic: %d]\n\n",
+  phenocopy_rate_relatives_3rd,
+  n_affected_relatives_3rd_dgr_phenocopy,
+  n_affected_relatives_3rd_dgr,
+  n_affected_relatives_3rd_dgr_polygenic,
+  n_affected_relatives_3rd_dgr_diff_ancestor
+))
 
 # Combine metrics
 metric_files <- snakemake@input[["metrics"]]

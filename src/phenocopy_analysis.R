@@ -11,7 +11,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) >= 1) {
   in_file <- args[1]
 } else {
-  in_file <- "combined_simulations.csv"
+  in_file <- "results/phenocopies/combined_simulations.csv"
 }
 
 message("Reading: ", in_file)
@@ -23,9 +23,10 @@ df_als <- df %>% filter(mendel_ALS_Y == 1)
 # Define column names as CHARACTER VECTOR (this is key!)
 target_cols <- c(
   "mendel_ALS_Y", "polygenicY_ALS", 
-  "relatives_1st", "relatives_1st_als", "relatives_1st_als_monogenic", "relatives_1st_als_polygenic",
-  "relatives_2nd", "relatives_2nd_als", "relatives_2nd_als_monogenic", "relatives_2nd_als_polygenic",
-  "relatives_3rd", "relatives_3rd_als", "relatives_3rd_als_monogenic", "relatives_3rd_als_polygenic"
+  "relatives_1st", "relatives_1st_als", "relatives_1st_als_monogenic", "relatives_1st_als_polygenic", "relatives_1st_different_monogenic_ancestor",
+  "relatives_2nd", "relatives_2nd_als", "relatives_2nd_als_monogenic", "relatives_2nd_als_polygenic", "relatives_2nd_different_monogenic_ancestor", 
+  "relatives_3rd", "relatives_3rd_als", "relatives_3rd_als_monogenic", "relatives_3rd_als_polygenic", "relatives_3rd_different_monogenic_ancestor",
+  "phenocopy_1st", "phenocopy_2nd", "phenocopy_3rd", "phenocopy"
 )
 
 ## Filter to phenocopies + select columns
@@ -43,3 +44,27 @@ message("Wrote to: ", out_file)
 
 # Preview
 print(head(df_phenocopy))
+
+for (col in target_cols) {
+  cat("\n=== ", col, " ===\n", sep = "")
+  print(table(df_phenocopy[[col]], useNA = "ifany"))
+}
+
+## Any phenocopy index with both polygenic and different-ancestor monogenic phenocopy?
+
+has_both <- df_phenocopy %>%
+  mutate(
+    any_polygenic = (relatives_1st_als_polygenic > 0 |
+                     relatives_2nd_als_polygenic > 0 |
+                     relatives_3rd_als_polygenic > 0),
+    any_diff_ancestor = (relatives_1st_different_monogenic_ancestor > 0 |
+                         relatives_2nd_different_monogenic_ancestor > 0 |
+                         relatives_3rd_different_monogenic_ancestor > 0),
+    both_types = any_polygenic & any_diff_ancestor
+  )
+
+# How many such index patients?
+sum(has_both$both_types)
+
+# Which IDs?
+has_both$id[has_both$both_types]

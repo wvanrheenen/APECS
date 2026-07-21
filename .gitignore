@@ -11,6 +11,7 @@
 
 # Directories not to upload
 heritability_contribution
+ibdsim
 logs
 simulations # these are the subdirectories in every results directory (in main analyses, ALPINE_plug, or varying_params directory)
 metrics # these are the subdirectories in every results directory (in main analyses, ALPINE_plug, or varying_params directory)

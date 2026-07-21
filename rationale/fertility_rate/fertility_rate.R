@@ -99,13 +99,13 @@ fert_estimates <- fert_estimates %>%
 fert_rate <- fert_rate %>%
   filter(year >= 1850 & year <2100)
 
-pdf("simulated_fertility_rate.pdf", height = 3, width = 4.5)
+pdf("simulated_fertility_rate.pdf", height = 3, width = 3)
 ggplot(data = fert_estimates, aes(x = yob_children, y = N_offspring, color = "Simulated")) +
   stat_summary(fun = mean, geom = "line") + 
   geom_line(data = fert_rate, aes(x = year, y = mean_fertility, color = "Historical")) + 
   xlab("Year of offspring") +
   ylab("Mean fertility rate") +
-  labs(title = "(B) Historical vs. simulated fertility rate") +
+  labs(title = "(A) Historical vs. simulated fertility rate") +
   scale_color_manual(values = wes_palette(n = 2, name = "Darjeeling1"),
                      name = "Data") +
   theme_bw() +

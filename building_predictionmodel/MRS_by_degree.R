@@ -6,7 +6,7 @@ suppressPackageStartupMessages(suppressWarnings({
 
 
 # Input / output setup
-df <- read_csv("../results/testset/combined_simulations.csv")
+df <- read_csv("../results/phenocopies/combined_simulations.csv")
 if (!dir.exists("mrs_relatives")) dir.create("mrs_relatives")
 
 
@@ -23,8 +23,15 @@ df_grouped <- df %>%
 
 
 group_counts <- df_grouped %>% count(group) %>% deframe()
+
+group_names <- c(
+  "Polygenic ALS" = "Polygenic ALS",
+  "Common Monogenic ALS" = "Common\nMonogenic ALS",
+  "Rare Monogenic ALS" = "Rare, pathogenic\nMonogenic ALS"
+)
+
 group_labels <- setNames(
-  paste0(names(group_counts), "\n(n=", group_counts, ")"),
+  paste0(group_names[names(group_counts)], "\n(n=", scales::comma(group_counts), ")"),
   names(group_counts)
 )
 
@@ -88,23 +95,46 @@ create_mrs_data <- function(df, cols, scenario) {
 create_horizontal_mrs_plot <- function(data, scenario_name, show_legend = TRUE) {
   p <- ggplot(data, aes(y = group, x = proportion, fill = total_affected_cat_stack)) +
     geom_col(width = 0.8, color = "black", linewidth = 0.3) +
-    geom_text(aes(label = ifelse(proportion >= 0.03, percent(proportion, 0.1), "")), 
-              position = position_fill(vjust = 0.5), size = 3, color = "black") +
-    # geom_vline(xintercept = seq(0.2, 0.8, 0.2), color = "grey85", alpha=0.5, linewidth = 0.3) +
+    geom_text(
+      aes(label = ifelse(proportion >= 0.03, percent(proportion, 0.1), "")),
+      position = position_fill(vjust = 0.5),
+      size = 3,
+      color = "black"
+    ) +
+    # Legend: keep categorical labels, but ensure any numbers use commas
     scale_fill_manual(
-      values = c(">4" = "#DC143C", "4" = "#FF6347", "3" = "#FFA500", "2" = "#FFD700", "1" = "#90EE90", "0" = "#2E8B57"),
+      values = c(
+        ">4" = "#DC143C", "4" = "#FF6347", "3" = "#FFA500",
+        "2" = "#FFD700", "1" = "#90EE90", "0" = "#2E8B57"
+      ),
       breaks = levels(data$total_affected_cat_legend),
       labels = levels(data$total_affected_cat_legend),
       name = "No. affected relatives",
       guide = guide_legend(ncol = 6, title.position = "left")
     ) +
-    scale_x_continuous(labels = percent_format(1L), limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+    # X-axis: no expansion, exactly 0–1 (0–100%)
+    scale_x_continuous(
+      labels = percent_format(accuracy = 1),
+      limits = c(0, 1),
+      breaks = seq(0, 1, 0.2),
+      expand = c(0, 0)
+    ) +
     scale_y_discrete(labels = group_labels) +
-    labs(title = scenario_name, x = "Percent of index patients", y = NULL) +
+    labs(
+      title = scenario_name,
+      x = "Percent of index patients",
+      y = NULL
+    ) +
     theme_bw(base_size = 10) +
     theme(
       plot.title = element_text(size = 12, hjust = 0.5, face = "bold"),
-      axis.text.y = element_text(size = 10)  # Bigger y-axis labels
+      axis.text.y = element_text(size = 10),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      panel.background   = element_blank(),
+      panel.border       = element_blank(),
+      axis.ticks.x       = element_blank(),
+      axis.ticks.y       = element_blank()
     )
 
   if (show_legend) {
@@ -112,7 +142,7 @@ create_horizontal_mrs_plot <- function(data, scenario_name, show_legend = TRUE) 
   } else {
     p <- p + theme(legend.position = "none")
   }
-  
+
   return(p)
 }
 

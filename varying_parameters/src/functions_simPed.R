@@ -40,11 +40,19 @@ init_ped = function(DAF_common, DAF_patho, DAF_ftd, k, mean_gen_yr, yob_index, l
                         a2_patho  = sample(c(0,1), 1, prob=c(1-DAF_patho, DAF_patho)), # sample disease allele from population frequency
                         a1_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)), # sample disease allele from population frequency
                         a2_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd))) # sample disease allele from population frequency 
+  # label origin of monogenic disease alleles
+  core_ped$a1_common_label = ifelse(core_ped$a1_common == 1, paste0(core_ped$id, "_a1"), NA_character_)
+  core_ped$a2_common_label = ifelse(core_ped$a2_common == 1, paste0(core_ped$id, "_a2"), NA_character_)
+  core_ped$a1_patho_label  = ifelse(core_ped$a1_patho  == 1, paste0(core_ped$id, "_a1"), NA_character_)
+  core_ped$a2_patho_label  = ifelse(core_ped$a2_patho  == 1, paste0(core_ped$id, "_a2"), NA_character_)
+  core_ped$a1_ftd_label    = ifelse(core_ped$a1_ftd    == 1, paste0(core_ped$id, "_a1"), NA_character_)
+  core_ped$a2_ftd_label    = ifelse(core_ped$a2_ftd    == 1, paste0(core_ped$id, "_a2"), NA_character_)
+
   # get the birth year of the founder:
   gen_yr = generate_gen_yr(mean_gen_yr)
   core_ped$yob = yob_index - k * gen_yr
   # simulate life expectancy
-  core_ped$mean_life_exp = life_expectancy$life_expectancy[life_expectancy$year_of_birth == core_ped$yob]
+  core_ped$mean_life_exp = ifelse(core_ped$yob > 1834, life_expectancy$life_expectancy[life_expectancy$year_of_birth == core_ped$yob], 59.25)
   core_ped$life_expectancy <- sample_life_expectancy(core_ped$mean_life_exp)
   # simulate age
   core_ped$age = current_year - core_ped$yob
@@ -84,7 +92,17 @@ add_gen = function(df_ped, lambda, k, DAF_common, DAF_patho, DAF_ftd, fert_rate,
                         a1_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)), # sample disease allele from population frequency
                         a2_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)), # sample disease allele from population frequency 
                         yob = I1s$yob[i])
-        I2$mean_life_exp = life_expectancy$life_expectancy[life_expectancy$year_of_birth == I2$yob]
+                      
+        # label origin of disease allele
+        I2$a1_common_label = ifelse(I2$a1_common == 1, paste0(I2$id, "_a1"), NA_character_)
+        I2$a2_common_label = ifelse(I2$a2_common == 1, paste0(I2$id, "_a2"), NA_character_)
+        I2$a1_patho_label  = ifelse(I2$a1_patho  == 1, paste0(I2$id, "_a1"), NA_character_)
+        I2$a2_patho_label  = ifelse(I2$a2_patho  == 1, paste0(I2$id, "_a2"), NA_character_)
+        I2$a1_ftd_label    = ifelse(I2$a1_ftd    == 1, paste0(I2$id, "_a1"), NA_character_)
+        I2$a2_ftd_label    = ifelse(I2$a2_ftd    == 1, paste0(I2$id, "_a2"), NA_character_)
+
+        I2$mean_life_exp = ifelse(I2$yob > 1834, life_expectancy$life_expectancy[life_expectancy$year_of_birth == I2$yob], 59.25)
+
         I2$life_expectancy <- sample_life_expectancy(I2$mean_life_exp) 
         I2$age = current_year - I2$yob
         if(I2$age > I2$life_expectancy){
@@ -119,13 +137,19 @@ add_gen = function(df_ped, lambda, k, DAF_common, DAF_patho, DAF_ftd, fert_rate,
           IIs$mid[j] = ifelse(I1s$sex[i] == 1, I1s$id[i], I2$id)
           IIs$sex[j] = sample(c(0,1), 1)
           IIs$a1_common[j]  = sample(c(I1s$a1_common[i], I1s$a2_common[i]), 1)
-          IIs$a2_common[j]  = sample(c(I2$a1_common, I2$a2_common), 1)
-          IIs$a1_patho[j]  = sample(c(I1s$a1_patho[i], I1s$a2_patho[i]), 1)
-          IIs$a2_patho[j]  = sample(c(I2$a1_patho, I2$a2_patho), 1)          
-          IIs$a1_ftd[j]  = sample(c(I1s$a1_ftd[i], I1s$a2_ftd[i]), 1)
-          IIs$a2_ftd[j]  = sample(c(I2$a1_ftd, I2$a2_ftd), 1)          
+          IIs$a1_common_label[j] = ifelse(IIs$a1_common[j] == I1s$a1_common[i], I1s$a1_common_label[i], I1s$a2_common_label[i])
+          IIs$a2_common[j] = sample(c(I2$a1_common, I2$a2_common), 1)
+          IIs$a2_common_label[j] = ifelse(IIs$a2_common[j] == I2$a1_common, I2$a1_common_label, I2$a2_common_label)
+          IIs$a1_patho[j] = sample(c(I1s$a1_patho[i], I1s$a2_patho[i]), 1)
+          IIs$a1_patho_label[j] = ifelse(IIs$a1_patho[j] == I1s$a1_patho[i], I1s$a1_patho_label[i], I1s$a2_patho_label[i])
+          IIs$a2_patho[j] = sample(c(I2$a1_patho, I2$a2_patho), 1)
+          IIs$a2_patho_label[j] = ifelse(IIs$a2_patho[j] == I2$a1_patho, I2$a1_patho_label, I2$a2_patho_label)
+          IIs$a1_ftd[j] = sample(c(I1s$a1_ftd[i], I1s$a2_ftd[i]), 1)
+          IIs$a1_ftd_label[j] = ifelse(IIs$a1_ftd[j] == I1s$a1_ftd[i], I1s$a1_ftd_label[i], I1s$a2_ftd_label[i])
+          IIs$a2_ftd[j] = sample(c(I2$a1_ftd, I2$a2_ftd), 1)
+          IIs$a2_ftd_label[j] = ifelse(IIs$a2_ftd[j] == I2$a1_ftd, I2$a1_ftd_label, I2$a2_ftd_label)       
           IIs$yob[j] = I1s$yob[i] + gen_yr
-          IIs$mean_life_exp[j] = life_expectancy$life_expectancy[life_expectancy$year_of_birth == IIs$yob[j]]
+          IIs$mean_life_exp[j] = ifelse(IIs$yob[j]>1834, life_expectancy$life_expectancy[life_expectancy$year_of_birth == IIs$yob[j]], 59.25)
           IIs$life_expectancy[j] = sample_life_expectancy(IIs$mean_life_exp[j])
           IIs$age[j] = current_year - IIs$yob[j]
           if(IIs$age[j] > IIs$life_expectancy[j]){
@@ -172,7 +196,15 @@ add_inlaws = function(df_ped, DAF_common, DAF_patho, DAF_ftd, mean_gen_yr, life_
                       a1_ftd  = ifelse(IIs$a1_ftd[i] == 1, 1, 0), # assume mother always transmits a1 for coding convenience
                       a2_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)), # non-transmitted allele sampled from population
                       yob = IIs$yob[i] - gen_yr) # define year of birth
-      I1$mean_life_exp = life_expectancy$life_expectancy[life_expectancy$year_of_birth == I1$yob]
+
+      I1$a1_common_label = IIs$a1_common_label[i]
+      I1$a2_common_label = ifelse(I1$a2_common == 1, paste0(I1$id, "_a2"), NA_character_)
+      I1$a1_patho_label  = IIs$a1_patho_label[i]
+      I1$a2_patho_label  = ifelse(I1$a2_patho == 1, paste0(I1$id, "_a2"), NA_character_)
+      I1$a1_ftd_label    = IIs$a1_ftd_label[i]
+      I1$a2_ftd_label    = ifelse(I1$a2_ftd == 1, paste0(I1$id, "_a2"), NA_character_)                      
+      I1$mean_life_exp = ifelse(I1$yob>1834, life_expectancy$life_expectancy[life_expectancy$year_of_birth == I1$yob], 59.25)
+
       I1$life_expectancy = sample_life_expectancy(I1$mean_life_exp)      
       I1$age = current_year - I1$yob
       if(I1$age > I1$life_expectancy){
@@ -195,7 +227,14 @@ add_inlaws = function(df_ped, DAF_common, DAF_patho, DAF_ftd, mean_gen_yr, life_
                       a1_ftd = ifelse(IIs$a2_ftd[i] == 1, 1, 0), # assume father always transmits a2 for coding convenience
                       a2_ftd = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)), # non-transmitted allele sampled from population 
                       yob = IIs$yob[i] - gen_yr) # define year of birth
-      I2$mean_life_exp = life_expectancy$life_expectancy[life_expectancy$year_of_birth == I2$yob]
+      I2$a1_common_label = IIs$a2_common_label[i]
+      I2$a2_common_label = ifelse(I2$a2_common == 1, paste0(I2$id, "_a2"), NA_character_)
+      I2$a1_patho_label  = IIs$a2_patho_label[i]
+      I2$a2_patho_label  = ifelse(I2$a2_patho == 1, paste0(I2$id, "_a2"), NA_character_)
+      I2$a1_ftd_label    = IIs$a2_ftd_label[i]
+      I2$a2_ftd_label    = ifelse(I2$a2_ftd == 1, paste0(I2$id, "_a2"), NA_character_)
+      I2$mean_life_exp = ifelse(I2$yob>1834, life_expectancy$life_expectancy[life_expectancy$year_of_birth == I2$yob], 59.25)
+
       I2$life_expectancy = sample_life_expectancy(I2$mean_life_exp) 
       I2$age = current_year - I2$yob
       if(I2$age > I2$life_expectancy){
@@ -261,14 +300,21 @@ add_ext_branches = function(df_ped, lambda, k, DAF_common, DAF_patho, DAF_ftd, m
             IIs$pid[j] = I2_id
             IIs$mid[j] = I1s$id[i]
             IIs$sex[j] = sample(c(0,1), 1)
-            IIs$a1_common[j]  = sample(c(I1s$a1_common[i], I1s$a2_common[i]), 1) # a1 is always from mother - here, I1
-            IIs$a2_common[j]  = sample(c(I2$a1_common, I2$a2_common), 1)
-            IIs$a1_patho[j]  = sample(c(I1s$a1_patho[i], I1s$a2_patho[i]), 1) # a1 is always from mother - here, I1
-            IIs$a2_patho[j]  = sample(c(I2$a1_patho, I2$a2_patho), 1)
-            IIs$a1_ftd[j]  = sample(c(I1s$a1_ftd[i], I1s$a2_ftd[i]), 1) # a1 is always from mother - here, I1
-            IIs$a2_ftd[j]  = sample(c(I2$a1_ftd, I2$a2_ftd), 1)            
+            IIs$a1_common[j]  = sample(c(I1s$a1_common[i], I1s$a2_common[i]), 1)
+            IIs$a1_common_label[j] = ifelse(IIs$a1_common[j] == I1s$a1_common[i], I1s$a1_common_label[i], I1s$a2_common_label[i])
+            IIs$a2_common[j] = sample(c(I2$a1_common, I2$a2_common), 1)
+            IIs$a2_common_label[j] = ifelse(IIs$a2_common[j] == I2$a1_common, I2$a1_common_label, I2$a2_common_label)
+            IIs$a1_patho[j] = sample(c(I1s$a1_patho[i], I1s$a2_patho[i]), 1)
+            IIs$a1_patho_label[j] = ifelse(IIs$a1_patho[j] == I1s$a1_patho[i], I1s$a1_patho_label[i], I1s$a2_patho_label[i])
+            IIs$a2_patho[j] = sample(c(I2$a1_patho, I2$a2_patho), 1)
+            IIs$a2_patho_label[j] = ifelse(IIs$a2_patho[j] == I2$a1_patho, I2$a1_patho_label, I2$a2_patho_label)
+            IIs$a1_ftd[j] = sample(c(I1s$a1_ftd[i], I1s$a2_ftd[i]), 1)
+            IIs$a1_ftd_label[j] = ifelse(IIs$a1_ftd[j] == I1s$a1_ftd[i], I1s$a1_ftd_label[i], I1s$a2_ftd_label[i])
+            IIs$a2_ftd[j] = sample(c(I2$a1_ftd, I2$a2_ftd), 1)
+            IIs$a2_ftd_label[j] = ifelse(IIs$a2_ftd[j] == I2$a1_ftd, I2$a1_ftd_label, I2$a2_ftd_label)                  
             IIs$yob[j] = I1s$yob[i] + gen_yr
-            IIs$mean_life_exp[j] = life_expectancy$life_expectancy[life_expectancy$year_of_birth == IIs$yob[j]]
+            IIs$mean_life_exp[j] = ifelse(IIs$yob[j]>1834, life_expectancy$life_expectancy[life_expectancy$year_of_birth == IIs$yob[j]], 59.25)
+
             IIs$life_expectancy[j] = sample_life_expectancy(IIs$mean_life_exp[j])
             IIs$age[j] = current_year - IIs$yob[j]
             if(IIs$age[j] > IIs$life_expectancy[j]){
@@ -304,7 +350,19 @@ add_ext_branches = function(df_ped, lambda, k, DAF_common, DAF_patho, DAF_ftd, m
                         a1_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)),
                         a2_ftd  = sample(c(0,1), 1, prob=c(1-DAF_ftd, DAF_ftd)),
                         yob = I1s$yob[i])
-        I2$mean_life_exp = life_expectancy$life_expectancy[life_expectancy$year_of_birth == I2$yob]
+
+        # label origin of disease allele
+        I2$a1_common_label = ifelse(I2$a1_common == 1, paste0(I2$id, "_a1"), NA_character_)
+        I2$a2_common_label = ifelse(I2$a2_common == 1, paste0(I2$id, "_a2"), NA_character_)
+
+        I2$a1_patho_label  = ifelse(I2$a1_patho  == 1, paste0(I2$id, "_a1"), NA_character_)
+        I2$a2_patho_label  = ifelse(I2$a2_patho  == 1, paste0(I2$id, "_a2"), NA_character_)
+
+        I2$a1_ftd_label    = ifelse(I2$a1_ftd    == 1, paste0(I2$id, "_a1"), NA_character_)
+        I2$a2_ftd_label    = ifelse(I2$a2_ftd    == 1, paste0(I2$id, "_a2"), NA_character_)
+
+        I2$mean_life_exp = ifelse(I2$yob>1834, life_expectancy$life_expectancy[life_expectancy$year_of_birth == I2$yob], 59.25)
+
         I2$life_expectancy = sample_life_expectancy(I2$mean_life_exp)        
         I2$age = current_year - I2$yob
         if(I2$age > I2$life_expectancy){
@@ -333,13 +391,20 @@ add_ext_branches = function(df_ped, lambda, k, DAF_common, DAF_patho, DAF_ftd, m
           IIs$mid[j] = ifelse(I1s$sex[i] == 1, I1s$id[i], I2$id)
           IIs$sex[j] = sample(c(0,1), 1)
           IIs$a1_common[j]  = sample(c(I1s$a1_common[i], I1s$a2_common[i]), 1)
-          IIs$a2_common[j]  = sample(c(I2$a1_common, I2$a2_common), 1)
-          IIs$a1_patho[j]  = sample(c(I1s$a1_patho[i], I1s$a2_patho[i]), 1)
-          IIs$a2_patho[j]  = sample(c(I2$a1_patho, I2$a2_patho), 1)
-          IIs$a1_ftd[j]  = sample(c(I1s$a1_ftd[i], I1s$a2_ftd[i]), 1)
-          IIs$a2_ftd[j]  = sample(c(I2$a1_ftd, I2$a2_ftd), 1) 
+          IIs$a1_common_label[j] = ifelse(IIs$a1_common[j] == I1s$a1_common[i], I1s$a1_common_label[i], I1s$a2_common_label[i])
+          IIs$a2_common[j] = sample(c(I2$a1_common, I2$a2_common), 1)
+          IIs$a2_common_label[j] = ifelse(IIs$a2_common[j] == I2$a1_common, I2$a1_common_label, I2$a2_common_label)
+          IIs$a1_patho[j] = sample(c(I1s$a1_patho[i], I1s$a2_patho[i]), 1)
+          IIs$a1_patho_label[j] = ifelse(IIs$a1_patho[j] == I1s$a1_patho[i], I1s$a1_patho_label[i], I1s$a2_patho_label[i])
+          IIs$a2_patho[j] = sample(c(I2$a1_patho, I2$a2_patho), 1)
+          IIs$a2_patho_label[j] = ifelse(IIs$a2_patho[j] == I2$a1_patho, I2$a1_patho_label, I2$a2_patho_label)
+          IIs$a1_ftd[j] = sample(c(I1s$a1_ftd[i], I1s$a2_ftd[i]), 1)
+          IIs$a1_ftd_label[j] = ifelse(IIs$a1_ftd[j] == I1s$a1_ftd[i], I1s$a1_ftd_label[i], I1s$a2_ftd_label[i])
+          IIs$a2_ftd[j] = sample(c(I2$a1_ftd, I2$a2_ftd), 1)
+          IIs$a2_ftd_label[j] = ifelse(IIs$a2_ftd[j] == I2$a1_ftd, I2$a1_ftd_label, I2$a2_ftd_label)  
           IIs$yob[j] = I1s$yob[i] + gen_yr
-          IIs$mean_life_exp[j] = life_expectancy$life_expectancy[life_expectancy$year_of_birth == IIs$yob[j]]
+          IIs$mean_life_exp[j] = ifelse(IIs$yob[j]>1834, life_expectancy$life_expectancy[life_expectancy$year_of_birth == IIs$yob[j]], 59.25)
+
           IIs$life_expectancy[j] = sample_life_expectancy(IIs$mean_life_exp[j])
           IIs$age[j] = current_year - IIs$yob[j]
           if(IIs$age[j] > IIs$life_expectancy[j]){
@@ -656,14 +721,42 @@ add_pheno = function(df_ped, disease_onset, penetrance_ALS_common, penetrance_AL
   return(df_ped)
 }
 
-#' function to identify relatedness of monogenic 
+#' function to check if monogenic index patients and their monogenic affected relatives have the same common ancestor of their disease allele (i.e. phenocopy trakcer)
+# Compare disease-allele labels between two individuals
+# Returns TRUE if both are monogenic ALS and their label sets differ
+has_different_monogenic_ancestry <- function(df, index_id, sib_id) {
+  idx <- df[df$id == index_id, ]
+  sib <- df[df$id == sib_id, ]
 
+  if (nrow(idx) == 0 || nrow(sib) == 0) return(FALSE)
+
+  # Both must be monogenic ALS
+  if (idx$mendel_ALS_Y != 1 || sib$mendel_ALS_Y != 1) return(FALSE)
+
+  label_cols <- c("a1_common_label", "a2_common_label",
+                  "a1_patho_label",  "a2_patho_label")
+
+  idx_labels <- unlist(idx[ , label_cols], use.names = FALSE)
+  sib_labels <- unlist(sib[ , label_cols], use.names = FALSE)
+
+  idx_labels <- unique(idx_labels[!is.na(idx_labels) & idx_labels != ""])
+  sib_labels <- unique(sib_labels[!is.na(sib_labels) & sib_labels != ""])
+
+  # If either has no labels, treat as no ancestry information → no difference
+  if (length(idx_labels) == 0L || length(sib_labels) == 0L) return(FALSE)
+
+  # Different ancestry if the sets are not identical
+  !setequal(idx_labels, sib_labels)
+}
+
+#' function to identify relatedness of monogenic 
 add_1st_relatives = function(df_ped, k) {
   # Initialize columns for relative counts
   df_ped$relatives_1st = 0
   df_ped$relatives_1st_als = 0
   df_ped$relatives_1st_als_monogenic = 0
   df_ped$relatives_1st_als_polygenic = 0
+  df_ped$relatives_1st_different_monogenic_ancestor = 0
   df_ped$relatives_1st_ftd = 0
   df_ped$relatives_1st_ftd_unique = 0
   df_ped$relatives_1st_dementia = 0
@@ -686,6 +779,7 @@ add_1st_relatives = function(df_ped, k) {
     relatives_1st_als = 0
     relatives_1st_als_monogenic = 0
     relatives_1st_als_polygenic = 0
+    relatives_1st_different_monogenic_ancestor = 0
     relatives_1st_ftd = 0
     relatives_1st_ftd_unique = 0
     relatives_1st_dementia = 0
@@ -699,6 +793,14 @@ add_1st_relatives = function(df_ped, k) {
     relatives_1st_als = relatives_1st_als + sum(siblings$Y_ALS == 1 & siblings$year_onset_ALS <= proband_onset & !is.na(siblings$year_onset_ALS))
     relatives_1st_als_monogenic = relatives_1st_als_monogenic + sum(siblings$mendel_ALS_Y == 1 & siblings$year_onset_ALS <= proband_onset & !is.na(siblings$year_onset_ALS))
     relatives_1st_als_polygenic = relatives_1st_als_polygenic + sum(siblings$polygenicY_ALS == 1 & siblings$year_onset_ALS <= proband_onset & !is.na(siblings$year_onset_ALS))
+
+    relatives_1st_different_monogenic_ancestor = relatives_1st_different_monogenic_ancestor + sum(vapply(seq_len(nrow(siblings)), function(s) {
+        siblings$Y_ALS[s] == 1 &&
+          siblings$year_onset_ALS[s] <= proband_onset &&
+          !is.na(siblings$year_onset_ALS[s]) &&
+          has_different_monogenic_ancestry(df_ped, id, siblings$id[s])
+      }, logical(1)))
+
     relatives_1st_ftd = relatives_1st_ftd + sum(siblings$Y_FTD == 1 & siblings$year_onset_FTD <= proband_onset & !is.na(siblings$year_onset_FTD))
     relatives_1st_ftd_unique = relatives_1st_ftd_unique + sum(siblings$Y_FTD == 1 & (siblings$Y_ALS == 0 | siblings$year_onset_ALS > proband_onset) & siblings$year_onset_FTD <= proband_onset & !is.na(siblings$year_onset_FTD))
     relatives_1st_dementia = relatives_1st_dementia + sum(siblings$Y_dementia == 1 & siblings$year_onset_dementia <= proband_onset & !is.na(siblings$year_onset_dementia))
@@ -710,6 +812,14 @@ add_1st_relatives = function(df_ped, k) {
     relatives_1st_als = relatives_1st_als + sum(parents$Y_ALS == 1 & parents$year_onset_ALS <= proband_onset & !is.na(parents$year_onset_ALS))
     relatives_1st_als_monogenic = relatives_1st_als_monogenic + sum(parents$mendel_ALS_Y == 1 & parents$year_onset_ALS <= proband_onset & !is.na(parents$year_onset_ALS))
     relatives_1st_als_polygenic = relatives_1st_als_polygenic + sum(parents$polygenicY_ALS == 1 & parents$year_onset_ALS <= proband_onset & !is.na(parents$year_onset_ALS))
+
+    relatives_1st_different_monogenic_ancestor = relatives_1st_different_monogenic_ancestor + sum(vapply(seq_len(nrow(parents)), function(s) {
+        parents$Y_ALS[s] == 1 &&
+          parents$year_onset_ALS[s] <= proband_onset &&
+          !is.na(parents$year_onset_ALS[s]) &&
+          has_different_monogenic_ancestry(df_ped, id, parents$id[s])
+      }, logical(1)))
+
     relatives_1st_ftd = relatives_1st_ftd + sum(parents$Y_FTD == 1 & parents$year_onset_FTD <= proband_onset & !is.na(parents$year_onset_FTD))
     relatives_1st_ftd_unique = relatives_1st_ftd_unique + sum(parents$Y_FTD == 1 & (parents$Y_ALS == 0 | parents$year_onset_ALS > proband_onset) & parents$year_onset_FTD <= proband_onset & !is.na(parents$year_onset_FTD))
     relatives_1st_dementia = relatives_1st_dementia + sum(parents$Y_dementia == 1 & parents$year_onset_dementia <= proband_onset & !is.na(parents$year_onset_dementia))
@@ -721,6 +831,14 @@ add_1st_relatives = function(df_ped, k) {
     relatives_1st_als = relatives_1st_als + sum(children$Y_ALS == 1 & children$year_onset_ALS <= proband_onset & !is.na(children$year_onset_ALS))
     relatives_1st_als_monogenic = relatives_1st_als_monogenic + sum(children$mendel_ALS_Y == 1 & children$year_onset_ALS <= proband_onset & !is.na(children$year_onset_ALS))
     relatives_1st_als_polygenic = relatives_1st_als_polygenic + sum(children$polygenicY_ALS == 1 & children$year_onset_ALS <= proband_onset & !is.na(children$year_onset_ALS))
+
+    relatives_1st_different_monogenic_ancestor = relatives_1st_different_monogenic_ancestor + sum(vapply(seq_len(nrow(children)), function(s) {
+        children$Y_ALS[s] == 1 &&
+          children$year_onset_ALS[s] <= proband_onset &&
+          !is.na(children$year_onset_ALS[s]) &&
+          has_different_monogenic_ancestry(df_ped, id, children$id[s])
+      }, logical(1)))
+
     relatives_1st_ftd = relatives_1st_ftd + sum(children$Y_FTD == 1 & children$year_onset_FTD <= proband_onset & !is.na(children$year_onset_FTD))
     relatives_1st_ftd_unique = relatives_1st_ftd_unique + sum(children$Y_FTD == 1 & (children$Y_ALS == 0 | children$year_onset_ALS > proband_onset) & children$year_onset_FTD <= proband_onset & !is.na(children$year_onset_FTD))
     relatives_1st_dementia = relatives_1st_dementia + sum(children$Y_dementia == 1 & children$year_onset_dementia <= proband_onset & !is.na(children$year_onset_dementia))
@@ -731,6 +849,7 @@ add_1st_relatives = function(df_ped, k) {
     df_ped$relatives_1st_als[i] = relatives_1st_als
     df_ped$relatives_1st_als_monogenic[i] = relatives_1st_als_monogenic
     df_ped$relatives_1st_als_polygenic[i] = relatives_1st_als_polygenic  
+    df_ped$relatives_1st_different_monogenic_ancestor[i] = relatives_1st_different_monogenic_ancestor  
     df_ped$relatives_1st_ftd[i] = relatives_1st_ftd
     df_ped$relatives_1st_ftd_unique[i] = relatives_1st_ftd_unique
     df_ped$relatives_1st_dementia[i] = relatives_1st_dementia
@@ -745,6 +864,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
   df_ped$relatives_2nd_als = 0
   df_ped$relatives_2nd_als_monogenic = 0
   df_ped$relatives_2nd_als_polygenic = 0
+  df_ped$relatives_2nd_different_monogenic_ancestor = 0
   df_ped$relatives_2nd_ftd = 0
   df_ped$relatives_2nd_ftd_unique = 0
   df_ped$relatives_2nd_dementia = 0
@@ -753,6 +873,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
   df_ped$relatives_3rd_als = 0
   df_ped$relatives_3rd_als_monogenic = 0
   df_ped$relatives_3rd_als_polygenic = 0
+  df_ped$relatives_3rd_different_monogenic_ancestor = 0
   df_ped$relatives_3rd_ftd = 0
   df_ped$relatives_3rd_ftd_unique = 0
   df_ped$relatives_3rd_dementia = 0
@@ -761,6 +882,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
   df_ped$relatives_close_3rd_als = 0
   df_ped$relatives_close_3rd_als_monogenic = 0
   df_ped$relatives_close_3rd_als_polygenic = 0
+  df_ped$relatives_close_3rd_different_monogenic_ancestor = 0
   df_ped$relatives_close_3rd_ftd = 0
   df_ped$relatives_close_3rd_ftd_unique = 0
   df_ped$relatives_close_3rd_dementia = 0
@@ -783,6 +905,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
     relatives_2nd_als = 0
     relatives_2nd_als_monogenic = 0
     relatives_2nd_als_polygenic = 0
+    relatives_2nd_different_monogenic_ancestor = 0
     relatives_2nd_ftd = 0
     relatives_2nd_ftd_unique = 0
     relatives_2nd_dementia = 0
@@ -791,6 +914,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
     relatives_3rd_als = 0
     relatives_3rd_als_monogenic = 0
     relatives_3rd_als_polygenic = 0
+    relatives_3rd_different_monogenic_ancestor = 0
     relatives_3rd_ftd = 0    
     relatives_3rd_ftd_unique = 0
     relatives_3rd_dementia = 0    
@@ -799,6 +923,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
     relatives_close_3rd_als = 0
     relatives_close_3rd_als_monogenic = 0
     relatives_close_3rd_als_polygenic = 0
+    relatives_close_3rd_different_monogenic_ancestor = 0
     relatives_close_3rd_ftd = 0    
     relatives_close_3rd_ftd_unique = 0
     relatives_close_3rd_dementia = 0    
@@ -825,6 +950,14 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
       relatives_2nd_als = relatives_2nd_als + sum(grandparent_rows$Y_ALS == 1 & grandparent_rows$year_onset_ALS <= proband_onset & !is.na(grandparent_rows$year_onset_ALS))
       relatives_2nd_als_monogenic = relatives_2nd_als_monogenic + sum(grandparent_rows$mendel_ALS_Y == 1 & grandparent_rows$year_onset_ALS <= proband_onset & !is.na(grandparent_rows$year_onset_ALS))
       relatives_2nd_als_polygenic = relatives_2nd_als_polygenic + sum(grandparent_rows$polygenicY_ALS == 1 & grandparent_rows$year_onset_ALS <= proband_onset & !is.na(grandparent_rows$year_onset_ALS))
+
+      relatives_2nd_different_monogenic_ancestor = relatives_2nd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(grandparent_rows)), function(s) {
+          grandparent_rows$Y_ALS[s] == 1 &&
+            grandparent_rows$year_onset_ALS[s] <= proband_onset &&
+            !is.na(grandparent_rows$year_onset_ALS[s]) &&
+            has_different_monogenic_ancestry(df_ped, id, grandparent_rows$id[s])
+        }, logical(1)))
+              
       relatives_2nd_ftd = relatives_2nd_ftd + sum(grandparent_rows$Y_FTD == 1 & grandparent_rows$year_onset_FTD <= proband_onset & !is.na(grandparent_rows$year_onset_FTD))
       relatives_2nd_ftd_unique = relatives_2nd_ftd_unique + sum(grandparent_rows$Y_FTD == 1 & (grandparent_rows$Y_ALS == 0 | grandparent_rows$year_onset_ALS > proband_onset) & grandparent_rows$year_onset_FTD <= proband_onset & !is.na(grandparent_rows$year_onset_FTD))
       relatives_2nd_dementia = relatives_2nd_dementia + sum(grandparent_rows$Y_dementia == 1 & grandparent_rows$year_onset_dementia <= proband_onset & !is.na(grandparent_rows$year_onset_dementia))
@@ -857,6 +990,14 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
         relatives_3rd_als = relatives_3rd_als + sum(grand_uncle_aunt_rows$Y_ALS == 1 & grand_uncle_aunt_rows$year_onset_ALS <= proband_onset & !is.na(grand_uncle_aunt_rows$year_onset_ALS))
         relatives_3rd_als_monogenic = relatives_3rd_als_monogenic + sum(grand_uncle_aunt_rows$mendel_ALS_Y == 1 & grand_uncle_aunt_rows$year_onset_ALS <= proband_onset & !is.na(grand_uncle_aunt_rows$year_onset_ALS))
         relatives_3rd_als_polygenic = relatives_3rd_als_polygenic + sum(grand_uncle_aunt_rows$polygenicY_ALS == 1 & grand_uncle_aunt_rows$year_onset_ALS <= proband_onset & !is.na(grand_uncle_aunt_rows$year_onset_ALS))
+
+        relatives_3rd_different_monogenic_ancestor = relatives_3rd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(grand_uncle_aunt_rows)), function(s) {
+            grand_uncle_aunt_rows$Y_ALS[s] == 1 &&
+              grand_uncle_aunt_rows$year_onset_ALS[s] <= proband_onset &&
+              !is.na(grand_uncle_aunt_rows$year_onset_ALS[s]) &&
+              has_different_monogenic_ancestry(df_ped, id, grand_uncle_aunt_rows$id[s])
+          }, logical(1)))
+                
         relatives_3rd_ftd = relatives_3rd_ftd + sum(grand_uncle_aunt_rows$Y_FTD == 1 & grand_uncle_aunt_rows$year_onset_FTD <= proband_onset & !is.na(grand_uncle_aunt_rows$year_onset_FTD))
         relatives_3rd_ftd_unique = relatives_3rd_ftd_unique + sum(grand_uncle_aunt_rows$Y_FTD == 1 & (grand_uncle_aunt_rows$Y_ALS == 0 | grand_uncle_aunt_rows$year_onset_ALS > proband_onset) & grand_uncle_aunt_rows$year_onset_FTD <= proband_onset & !is.na(grand_uncle_aunt_rows$year_onset_FTD))
         relatives_3rd_dementia = relatives_3rd_dementia + sum(grand_uncle_aunt_rows$Y_dementia == 1 & grand_uncle_aunt_rows$year_onset_dementia <= proband_onset & !is.na(grand_uncle_aunt_rows$year_onset_dementia))
@@ -881,6 +1022,14 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
         relatives_3rd_als = relatives_3rd_als + sum(great_grandparent_rows$Y_ALS == 1 & great_grandparent_rows$year_onset_ALS <= proband_onset & !is.na(great_grandparent_rows$year_onset_ALS))
         relatives_3rd_als_monogenic = relatives_3rd_als_monogenic + sum(great_grandparent_rows$mendel_ALS_Y == 1 & great_grandparent_rows$year_onset_ALS <= proband_onset & !is.na(great_grandparent_rows$year_onset_ALS))
         relatives_3rd_als_polygenic = relatives_3rd_als_polygenic + sum(great_grandparent_rows$polygenicY_ALS == 1 & great_grandparent_rows$year_onset_ALS <= proband_onset & !is.na(great_grandparent_rows$year_onset_ALS))
+
+        relatives_3rd_different_monogenic_ancestor = relatives_3rd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(great_grandparent_rows)), function(s) {
+            great_grandparent_rows$Y_ALS[s] == 1 &&
+              great_grandparent_rows$year_onset_ALS[s] <= proband_onset &&
+              !is.na(great_grandparent_rows$year_onset_ALS[s]) &&
+              has_different_monogenic_ancestry(df_ped, id, great_grandparent_rows$id[s])
+          }, logical(1)))
+                
         relatives_3rd_ftd = relatives_3rd_ftd + sum(great_grandparent_rows$Y_FTD == 1 & great_grandparent_rows$year_onset_FTD <= proband_onset & !is.na(great_grandparent_rows$year_onset_FTD))
         relatives_3rd_ftd_unique = relatives_3rd_ftd_unique + sum(great_grandparent_rows$Y_FTD == 1 & (great_grandparent_rows$Y_ALS == 0 | great_grandparent_rows$year_onset_ALS > proband_onset) & great_grandparent_rows$year_onset_FTD <= proband_onset & !is.na(great_grandparent_rows$year_onset_FTD))
         relatives_3rd_dementia = relatives_3rd_dementia + sum(great_grandparent_rows$Y_dementia == 1 & great_grandparent_rows$year_onset_dementia <= proband_onset & !is.na(great_grandparent_rows$year_onset_dementia))
@@ -901,6 +1050,14 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
       relatives_2nd_als = relatives_2nd_als + sum(grandchild_rows$Y_ALS == 1 & grandchild_rows$year_onset_ALS <= proband_onset & !is.na(grandchild_rows$year_onset_ALS))
       relatives_2nd_als_monogenic = relatives_2nd_als_monogenic + sum(grandchild_rows$mendel_ALS_Y == 1 & grandchild_rows$year_onset_ALS <= proband_onset & !is.na(grandchild_rows$year_onset_ALS))
       relatives_2nd_als_polygenic = relatives_2nd_als_polygenic + sum(grandchild_rows$polygenicY_ALS == 1 & grandchild_rows$year_onset_ALS <= proband_onset & !is.na(grandchild_rows$year_onset_ALS))
+
+      relatives_2nd_different_monogenic_ancestor = relatives_2nd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(grandchild_rows)), function(s) {
+          grandchild_rows$Y_ALS[s] == 1 &&
+            grandchild_rows$year_onset_ALS[s] <= proband_onset &&
+            !is.na(grandchild_rows$year_onset_ALS[s]) &&
+            has_different_monogenic_ancestry(df_ped, id, grandchild_rows$id[s])
+        }, logical(1)))
+              
       relatives_2nd_ftd = relatives_2nd_ftd + sum(grandchild_rows$Y_FTD == 1 & grandchild_rows$year_onset_FTD <= proband_onset & !is.na(grandchild_rows$year_onset_FTD))
       relatives_2nd_ftd_unique = relatives_2nd_ftd_unique + sum(grandchild_rows$Y_FTD == 1 & (grandchild_rows$Y_ALS == 0 | grandchild_rows$year_onset_ALS > proband_onset) & grandchild_rows$year_onset_FTD <= proband_onset & !is.na(grandchild_rows$year_onset_FTD))
       relatives_2nd_dementia = relatives_2nd_dementia + sum(grandchild_rows$Y_dementia == 1 & grandchild_rows$year_onset_dementia <= proband_onset & !is.na(grandchild_rows$year_onset_dementia))
@@ -919,6 +1076,14 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
       relatives_3rd_als = relatives_3rd_als + sum(great_grandchild_rows$Y_ALS == 1 & great_grandchild_rows$year_onset_ALS <= proband_onset & !is.na(great_grandchild_rows$year_onset_ALS))
       relatives_3rd_als_monogenic = relatives_3rd_als_monogenic + sum(great_grandchild_rows$mendel_ALS_Y == 1 & great_grandchild_rows$year_onset_ALS <= proband_onset & !is.na(great_grandchild_rows$year_onset_ALS))
       relatives_3rd_als_polygenic = relatives_3rd_als_polygenic + sum(great_grandchild_rows$polygenicY_ALS == 1 & great_grandchild_rows$year_onset_ALS <= proband_onset & !is.na(great_grandchild_rows$year_onset_ALS))
+
+      relatives_3rd_different_monogenic_ancestor = relatives_3rd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(great_grandchild_rows)), function(s) {
+          great_grandchild_rows$Y_ALS[s] == 1 &&
+            great_grandchild_rows$year_onset_ALS[s] <= proband_onset &&
+            !is.na(great_grandchild_rows$year_onset_ALS[s]) &&
+            has_different_monogenic_ancestry(df_ped, id, great_grandchild_rows$id[s])
+        }, logical(1)))
+              
       relatives_3rd_ftd = relatives_3rd_ftd + sum(great_grandchild_rows$Y_FTD == 1 & great_grandchild_rows$year_onset_FTD <= proband_onset & !is.na(great_grandchild_rows$year_onset_FTD))
       relatives_3rd_ftd_unique = relatives_3rd_ftd_unique + sum(great_grandchild_rows$Y_FTD == 1 & (great_grandchild_rows$Y_ALS == 0 | great_grandchild_rows$year_onset_ALS > proband_onset) & great_grandchild_rows$year_onset_FTD <= proband_onset & !is.na(great_grandchild_rows$year_onset_FTD))
       relatives_3rd_dementia = relatives_3rd_dementia + sum(great_grandchild_rows$Y_dementia == 1 & great_grandchild_rows$year_onset_dementia <= proband_onset & !is.na(great_grandchild_rows$year_onset_dementia))
@@ -950,6 +1115,14 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
       relatives_2nd_als = relatives_2nd_als + sum(aunt_uncle_rows$Y_ALS == 1 & aunt_uncle_rows$year_onset_ALS <= proband_onset & !is.na(aunt_uncle_rows$year_onset_ALS))
       relatives_2nd_als_monogenic = relatives_2nd_als_monogenic + sum(aunt_uncle_rows$mendel_ALS_Y == 1 & aunt_uncle_rows$year_onset_ALS <= proband_onset & !is.na(aunt_uncle_rows$year_onset_ALS))
       relatives_2nd_als_polygenic = relatives_2nd_als_polygenic + sum(aunt_uncle_rows$polygenicY_ALS == 1 & aunt_uncle_rows$year_onset_ALS <= proband_onset & !is.na(aunt_uncle_rows$year_onset_ALS))
+
+      relatives_2nd_different_monogenic_ancestor = relatives_2nd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(aunt_uncle_rows)), function(s) {
+          aunt_uncle_rows$Y_ALS[s] == 1 &&
+            aunt_uncle_rows$year_onset_ALS[s] <= proband_onset &&
+            !is.na(aunt_uncle_rows$year_onset_ALS[s]) &&
+            has_different_monogenic_ancestry(df_ped, id, aunt_uncle_rows$id[s])
+        }, logical(1)))
+              
       relatives_2nd_ftd = relatives_2nd_ftd + sum(aunt_uncle_rows$Y_FTD == 1 & aunt_uncle_rows$year_onset_FTD <= proband_onset & !is.na(aunt_uncle_rows$year_onset_FTD))
       relatives_2nd_ftd_unique = relatives_2nd_ftd_unique + sum(aunt_uncle_rows$Y_FTD == 1 & (aunt_uncle_rows$Y_ALS == 0 | aunt_uncle_rows$year_onset_ALS > proband_onset) & aunt_uncle_rows$year_onset_FTD <= proband_onset & !is.na(aunt_uncle_rows$year_onset_FTD))
       relatives_2nd_dementia = relatives_2nd_dementia + sum(aunt_uncle_rows$Y_dementia == 1 & aunt_uncle_rows$year_onset_dementia <= proband_onset & !is.na(aunt_uncle_rows$year_onset_dementia))
@@ -980,6 +1153,14 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
       relatives_2nd_als = relatives_2nd_als + sum(nephew_niece_rows$Y_ALS == 1 & nephew_niece_rows$year_onset_ALS <= proband_onset & !is.na(nephew_niece_rows$year_onset_ALS))
       relatives_2nd_als_monogenic = relatives_2nd_als_monogenic + sum(nephew_niece_rows$mendel_ALS_Y == 1 & nephew_niece_rows$year_onset_ALS <= proband_onset & !is.na(nephew_niece_rows$year_onset_ALS))
       relatives_2nd_als_polygenic = relatives_2nd_als_polygenic + sum(nephew_niece_rows$polygenicY_ALS == 1 & nephew_niece_rows$year_onset_ALS <= proband_onset & !is.na(nephew_niece_rows$year_onset_ALS))
+
+      relatives_2nd_different_monogenic_ancestor = relatives_2nd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(nephew_niece_rows)), function(s) {
+          nephew_niece_rows$Y_ALS[s] == 1 &&
+            nephew_niece_rows$year_onset_ALS[s] <= proband_onset &&
+            !is.na(nephew_niece_rows$year_onset_ALS[s]) &&
+            has_different_monogenic_ancestry(df_ped, id, nephew_niece_rows$id[s])
+        }, logical(1)))
+              
       relatives_2nd_ftd = relatives_2nd_ftd + sum(nephew_niece_rows$Y_FTD == 1 & nephew_niece_rows$year_onset_FTD <= proband_onset & !is.na(nephew_niece_rows$year_onset_FTD))
       relatives_2nd_ftd_unique = relatives_2nd_ftd_unique + sum(nephew_niece_rows$Y_FTD == 1 & (nephew_niece_rows$Y_ALS == 0 | nephew_niece_rows$year_onset_ALS > proband_onset) & nephew_niece_rows$year_onset_FTD <= proband_onset & !is.na(nephew_niece_rows$year_onset_FTD))
       relatives_2nd_dementia = relatives_2nd_dementia + sum(nephew_niece_rows$Y_dementia == 1 & nephew_niece_rows$year_onset_dementia <= proband_onset & !is.na(nephew_niece_rows$year_onset_dementia))
@@ -997,6 +1178,14 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
         relatives_3rd_als = relatives_3rd_als + sum(grand_nephew_niece_rows$Y_ALS == 1 & grand_nephew_niece_rows$year_onset_ALS <= proband_onset & !is.na(grand_nephew_niece_rows$year_onset_ALS))
         relatives_3rd_als_monogenic = relatives_3rd_als_monogenic + sum(grand_nephew_niece_rows$mendel_ALS_Y == 1 & grand_nephew_niece_rows$year_onset_ALS <= proband_onset & !is.na(grand_nephew_niece_rows$year_onset_ALS))
         relatives_3rd_als_polygenic = relatives_3rd_als_polygenic + sum(grand_nephew_niece_rows$polygenicY_ALS == 1 & grand_nephew_niece_rows$year_onset_ALS <= proband_onset & !is.na(grand_nephew_niece_rows$year_onset_ALS))
+
+        relatives_3rd_different_monogenic_ancestor = relatives_3rd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(grand_nephew_niece_rows)), function(s) {
+            grand_nephew_niece_rows$Y_ALS[s] == 1 &&
+              grand_nephew_niece_rows$year_onset_ALS[s] <= proband_onset &&
+              !is.na(grand_nephew_niece_rows$year_onset_ALS[s]) &&
+              has_different_monogenic_ancestry(df_ped, id, grand_nephew_niece_rows$id[s])
+          }, logical(1)))
+                
         relatives_3rd_ftd = relatives_3rd_ftd + sum(grand_nephew_niece_rows$Y_FTD == 1 & grand_nephew_niece_rows$year_onset_FTD <= proband_onset & !is.na(grand_nephew_niece_rows$year_onset_FTD))
         relatives_3rd_ftd_unique = relatives_3rd_ftd_unique + sum(grand_nephew_niece_rows$Y_FTD == 1 & (grand_nephew_niece_rows$Y_ALS == 0 | grand_nephew_niece_rows$year_onset_ALS > proband_onset) & grand_nephew_niece_rows$year_onset_FTD <= proband_onset & !is.na(grand_nephew_niece_rows$year_onset_FTD))
         relatives_3rd_dementia = relatives_3rd_dementia + sum(grand_nephew_niece_rows$Y_dementia == 1 & grand_nephew_niece_rows$year_onset_dementia <= proband_onset & !is.na(grand_nephew_niece_rows$year_onset_dementia))
@@ -1038,14 +1227,31 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
       relatives_3rd_als = relatives_3rd_als + sum(first_cousin_rows$Y_ALS == 1 & first_cousin_rows$year_onset_ALS <= proband_onset & !is.na(first_cousin_rows$year_onset_ALS))
       relatives_3rd_als_monogenic = relatives_3rd_als_monogenic + sum(first_cousin_rows$mendel_ALS_Y == 1 & first_cousin_rows$year_onset_ALS <= proband_onset & !is.na(first_cousin_rows$year_onset_ALS))
       relatives_3rd_als_polygenic = relatives_3rd_als_polygenic + sum(first_cousin_rows$polygenicY_ALS == 1 & first_cousin_rows$year_onset_ALS <= proband_onset & !is.na(first_cousin_rows$year_onset_ALS))
+
+      relatives_3rd_different_monogenic_ancestor = relatives_3rd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(first_cousin_rows)), function(s) {
+          first_cousin_rows$Y_ALS[s] == 1 &&
+            first_cousin_rows$year_onset_ALS[s] <= proband_onset &&
+            !is.na(first_cousin_rows$year_onset_ALS[s]) &&
+            has_different_monogenic_ancestry(df_ped, id, first_cousin_rows$id[s])
+        }, logical(1)))
+              
       relatives_3rd_ftd = relatives_3rd_ftd + sum(first_cousin_rows$Y_FTD == 1 & first_cousin_rows$year_onset_FTD <= proband_onset & !is.na(first_cousin_rows$year_onset_FTD))
       relatives_3rd_ftd_unique = relatives_3rd_ftd_unique + sum(first_cousin_rows$Y_FTD == 1 & (first_cousin_rows$Y_ALS == 0 | first_cousin_rows$year_onset_ALS > proband_onset) & first_cousin_rows$year_onset_FTD <= proband_onset & !is.na(first_cousin_rows$year_onset_FTD))
       relatives_3rd_dementia = relatives_3rd_dementia + sum(first_cousin_rows$Y_dementia == 1 & first_cousin_rows$year_onset_dementia <= proband_onset & !is.na(first_cousin_rows$year_onset_dementia))
       relatives_3rd_dementia_unique = relatives_3rd_dementia_unique + sum(first_cousin_rows$Y_dementia == 1 & (first_cousin_rows$Y_ALS == 0 | first_cousin_rows$year_onset_ALS > proband_onset) & first_cousin_rows$year_onset_dementia <= proband_onset & !is.na(first_cousin_rows$year_onset_dementia))
+      
       relatives_close_3rd = nrow(first_cousin_rows)
       relatives_close_3rd_als = sum(first_cousin_rows$Y_ALS == 1 & first_cousin_rows$year_onset_ALS <= proband_onset & !is.na(first_cousin_rows$year_onset_ALS))
       relatives_close_3rd_als_monogenic = sum(first_cousin_rows$mendel_ALS_Y == 1 & first_cousin_rows$year_onset_ALS <= proband_onset & !is.na(first_cousin_rows$year_onset_ALS))
       relatives_close_3rd_als_polygenic = sum(first_cousin_rows$polygenicY_ALS == 1 & first_cousin_rows$year_onset_ALS <= proband_onset & !is.na(first_cousin_rows$year_onset_ALS))
+
+      relatives_close_3rd_different_monogenic_ancestor = relatives_close_3rd_different_monogenic_ancestor + sum(vapply(seq_len(nrow(first_cousin_rows)), function(s) {
+          first_cousin_rows$Y_ALS[s] == 1 &&
+            first_cousin_rows$year_onset_ALS[s] <= proband_onset &&
+            !is.na(first_cousin_rows$year_onset_ALS[s]) &&
+            has_different_monogenic_ancestry(df_ped, id, first_cousin_rows$id[s])
+        }, logical(1)))
+              
       relatives_close_3rd_ftd = sum(first_cousin_rows$Y_FTD == 1 & first_cousin_rows$year_onset_FTD <= proband_onset & !is.na(first_cousin_rows$year_onset_FTD))
       relatives_close_3rd_ftd_unique = sum(first_cousin_rows$Y_FTD == 1 & (first_cousin_rows$Y_ALS == 0 | first_cousin_rows$year_onset_ALS > proband_onset) & first_cousin_rows$year_onset_FTD <= proband_onset & !is.na(first_cousin_rows$year_onset_FTD))
       relatives_close_3rd_dementia = sum(first_cousin_rows$Y_dementia == 1 & first_cousin_rows$year_onset_dementia <= proband_onset & !is.na(first_cousin_rows$year_onset_dementia))
@@ -1057,6 +1263,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
     df_ped$relatives_2nd_als[i] = relatives_2nd_als
     df_ped$relatives_2nd_als_monogenic[i] = relatives_2nd_als_monogenic
     df_ped$relatives_2nd_als_polygenic[i] = relatives_2nd_als_polygenic
+    df_ped$relatives_2nd_different_monogenic_ancestor[i] = relatives_2nd_different_monogenic_ancestor 
     df_ped$relatives_2nd_ftd[i] = relatives_2nd_ftd
     df_ped$relatives_2nd_ftd_unique[i] = relatives_2nd_ftd_unique
     df_ped$relatives_2nd_dementia[i] = relatives_2nd_dementia
@@ -1065,6 +1272,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
     df_ped$relatives_3rd_als[i] = relatives_3rd_als
     df_ped$relatives_3rd_als_monogenic[i] = relatives_3rd_als_monogenic
     df_ped$relatives_3rd_als_polygenic[i] = relatives_3rd_als_polygenic
+    df_ped$relatives_3rd_different_monogenic_ancestor[i] = relatives_3rd_different_monogenic_ancestor  
     df_ped$relatives_3rd_ftd[i] = relatives_3rd_ftd
     df_ped$relatives_3rd_ftd_unique[i] = relatives_3rd_ftd_unique
     df_ped$relatives_3rd_dementia[i] = relatives_3rd_dementia
@@ -1073,6 +1281,7 @@ add_2nd_and_3rd_relatives = function(df_ped, k) {
     df_ped$relatives_close_3rd_als[i] = relatives_close_3rd_als
     df_ped$relatives_close_3rd_als_monogenic[i] = relatives_close_3rd_als_monogenic
     df_ped$relatives_close_3rd_als_polygenic[i] = relatives_close_3rd_als_polygenic
+    df_ped$relatives_close_3rd_different_monogenic_ancestor[i] = relatives_close_3rd_different_monogenic_ancestor  
     df_ped$relatives_close_3rd_ftd[i] = relatives_close_3rd_ftd
     df_ped$relatives_close_3rd_ftd_unique[i] = relatives_close_3rd_ftd_unique
     df_ped$relatives_close_3rd_dementia[i] = relatives_close_3rd_dementia
@@ -1247,19 +1456,30 @@ pedigree_simulations = function(
       next
     }
 
-    # Process ALL matching index patients (no head(1))
+    # Process ALL matching index patients
     for (j in 1:nrow(case_rows)) {
       case_row = case_rows[j, ]
       
+      # Initialize a column for phenocopies in the nth degree
+      case_row$phenocopy_1st = NA
+      case_row$phenocopy_2nd = NA
+      case_row$phenocopy_3rd = NA
+
+      # Only track phenocopies for monogenic patients
+      has_monogenic_index = case_row$mendel_ALS_Y == 1
+
       # Phenocopy = monogenic INDEX patient + any RELATED polygenic ALS in pedigree
       has_polygenic_ALS_1st = case_row$relatives_1st_als_polygenic > 0
       has_polygenic_ALS_2nd = case_row$relatives_2nd_als_polygenic > 0
       has_polygenic_ALS_3rd = case_row$relatives_3rd_als_polygenic > 0
 
-      has_monogenic_index = case_row$mendel_ALS_Y == 1
-      has_phenocopy_1st = has_monogenic_index & has_polygenic_ALS_1st
-      has_phenocopy_2nd = has_monogenic_index & has_polygenic_ALS_2nd
-      has_phenocopy_3rd = has_monogenic_index & has_polygenic_ALS_3rd
+      has_monogenic_different_ancestor_1st = case_row$relatives_1st_different_monogenic_ancestor > 0
+      has_monogenic_different_ancestor_2nd = case_row$relatives_2nd_different_monogenic_ancestor > 0
+      has_monogenic_different_ancestor_3rd = case_row$relatives_3rd_different_monogenic_ancestor > 0      
+
+      has_phenocopy_1st = has_monogenic_index & (has_polygenic_ALS_1st | has_monogenic_different_ancestor_1st)
+      has_phenocopy_2nd = has_monogenic_index & (has_polygenic_ALS_2nd | has_monogenic_different_ancestor_2nd)
+      has_phenocopy_3rd = has_monogenic_index & (has_polygenic_ALS_3rd | has_monogenic_different_ancestor_3rd)
 
       message(sprintf("Simulation %d has %d recent-onset ALS index patient(s) in founder pedigree. Adding to dataframe...", sim, nrow(case_rows)))
 

@@ -25,7 +25,7 @@ DAF_patho = 0.00012 # Derived from Douglas 2024 + Gnomad (SOD1+FUS)
 DAF_ftd = 0.00015 # Derived from Gnomad (GRN+MAPT)
 penetrance_ALS_common = 0.21 # read.table(file.path(script_dir, "/data/lifetime_disease_risk/lifetime_ALS_c9_risk.txt" ), header=T) # derived from Van Wijk 2024 (24%), Gao 2025
 penetrance_ALS_patho = 0.50 #read.table(file.path(script_dir, "/data/lifetime_disease_risk/lifetime_ALS_c9_risk.txt" ), header=T) # derived from Douglas 2024 (FUS 19%, SOD1 54%)
-h2_ALS = 0.45 # additive polygenic heritability, derived from vRheenen; Russel 2019; lowered for polygenic proportion
+h2_ALS = 0.40 # additive polygenic heritability, derived from vRheenen; Russel 2019; lowered for polygenic proportion
 K_ALS = (as.numeric(set) * 0.85) # derived from Levison 2025, 1/375 = 0.0027. Corrected for 10% monogenic. 
 penetrance_FTD_common = 0.1  # derived from Gao 2025
 penetrance_FTD_patho = 0.1 # copied from Gao 2025

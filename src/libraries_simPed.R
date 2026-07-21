@@ -1,5 +1,5 @@
 required_packages <- c(
-  "argparse", "data.table", "R.utils", "tidyverse", "MASS", "mvnfast", "kinship2", "sn", "igraph",
+  "argparse", "data.table", "R.utils", "tidyverse", "MASS", "mvnfast", "kinship2", "sn", "igraph", "ibdsim2",
   "pedtools", "ribd", "RColorBrewer", "this.path", "wesanderson", "broom", "fmsb", "patchwork", "dplyr", "tidyr"
 )
 
@@ -23,4 +23,5 @@ suppressMessages(library(fmsb))
 suppressMessages(library(patchwork))
 suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
+suppressMessages(library(ibdsim2))
 suppressMessages(library(igraph))

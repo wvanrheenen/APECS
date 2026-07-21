@@ -1,18 +1,19 @@
 # Snakefile
-# command: snakemake -s snakefile --executor slurm --jobs 100 --default-resources mem_mb=1000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 4 --slurm-keep-successful-logs all
+# snakemake -s snakefile --executor slurm --jobs 1500 --default-resources mem_mb=1000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 4 --slurm-keep-successful-logs all --forceall
+
 
 # Define the number of simulations and how many to run per job
-SETS = ["0.30", "0.40", "0.50", "0.60", "0.70"]
+SETS = ["0.20", "0.30", "0.40", "0.50", "0.60"]
 
 ANALYSIS_REPETITIONS = 10
 
 # To balance no. of cases for each variable
 SET_MULTIPLIER = {
+    "0.20": 1.0,
     "0.30": 1.0,
     "0.40": 1.0,
     "0.50": 1.0,
     "0.60": 1.0,
-    "0.70": 1.0,
 }
 
 BASE_TOTAL_SIMULATIONS = 100000
