@@ -14,7 +14,7 @@ This is a list of the subdirectories in our main github page:
   - This directory contains the files needed for the sensitivity analyses and demographic changes analyses in our main article.
 - rationale:
   - This directory contains the data required to validate whether the simulations match input parameters, real world demographic data and if the simulations actually simulate phenotypic traits as is expected.
-  - A separate README.md file is available for explanation on each rationale step.
+  - A separate README.md file will follow for explanation on each rationale step.
 - data:
   - This directory contains gathered and processed real world demographic and genetic data required as input to run the simulations.
 - ALPINE_plug:
