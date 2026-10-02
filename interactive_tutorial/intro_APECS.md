@@ -1,4 +1,4 @@
-# SimPlex
+# APECS
 
 A framework to simulate ALS and ALS-associated disease under a monogenic/Mendelian and polygenic/complex disease model.
 
@@ -716,7 +716,7 @@ ped_plt1 = ped(id = core_ped$id,
 carriers = filter(core_ped, (a1_common + a2_common + a1_patho + a2_patho) > 0)$id
 color = "white"
 
-png("intro_simPlex_examples/step1_core_pedigree.png", width=400, height=400)  # Adjust size and resolution as needed
+png("intro_APECS_examples/step1_core_pedigree.png", width=400, height=400)  # Adjust size and resolution as needed
 plot(
   ped_plt1,
   title="Step 1 - Core Pedigree",
@@ -728,7 +728,7 @@ dev.off()
 
 ```
 
-![](intro_simPlex_examples/step1_core_pedigree.png)<!-- -->
+![](intro_APECS_examples/step1_core_pedigree.png)<!-- -->
 
 ### Step 2. Simulate the inlaws, ancestors of the spouses married into this pedigree
 
@@ -744,7 +744,7 @@ color = ifelse(ped_plt2$ID %in% ped_plt1$ID, "white", "lightgray")
 
 plot(ped_plt2, title="Step 2 - simulated the in-laws", cex=1.5, carrier = carriers, fill=color)
 
-png("intro_simPlex_examples/step2_inlaws.png", width=400, height=400)  # Adjust size and resolution as needed
+png("intro_APECS_examples/step2_inlaws.png", width=400, height=400)  # Adjust size and resolution as needed
 plot(
   ped_plt2,
   title="Step 2 - In-laws",
@@ -755,7 +755,7 @@ plot(
 dev.off()
 ```
 
-![](intro_simPlex_examples/step2_inlaws.png)<!-- -->
+![](intro_APECS_examples/step2_inlaws.png)<!-- -->
 
 
 ### Step 3. Simulate external branches, unlinked to founder
@@ -773,7 +773,7 @@ carriers = filter(core_ped, (a1_common + a2_common + a1_patho + a2_patho) > 0)$i
 
 color = ifelse(ped_plt3$ID %in% ped_plt1$ID, "white", ifelse(ped_plt3$ID %in% ped_plt2$ID, "lightgray", "darkgray"))
 
-png("intro_simPlex_examples/step3_external_branches.png", width=400, height=400)  # Adjust size and resolution as needed
+png("intro_APECS_examples/step3_external_branches.png", width=400, height=400)  # Adjust size and resolution as needed
 plot(
   ped_plt3,
   title="Step 3 - External branches",
@@ -784,7 +784,7 @@ plot(
 dev.off()
 ```
 
-![](intro_simPlex_examples/step3_external_branches.png)<!-- -->
+![](intro_APECS_examples/step3_external_branches.png)<!-- -->
 
 ### Step 4. Simulate phenotypes
 
@@ -805,10 +805,10 @@ pal = colorRampPalette(c("white", "orange", "red"))(1000)
 Pcolors = pal[ceiling(pnorm(core_ped$P)*1000)]
 
 # make plots
-png("intro_simPlex_examples/step4_plot_ALS.png", width=800, height=600)  
+png("intro_APECS_examples/step4_plot_ALS.png", width=800, height=600)  
 plot(ped_plt3, title="Binary ALS phenotype", 
      carrier = carriers_ALS_FTD, aff = affected_ALS, cex=1.0)
 dev.off()
 ```
 
-![](intro_simPlex_examples/step4_plot_ALS.png)<!-- -->
+![](intro_APECS_examples/step4_plot_ALS.png)<!-- -->

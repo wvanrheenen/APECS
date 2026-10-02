@@ -6,6 +6,7 @@ suppressPackageStartupMessages({
   library(readr)
   library(scales)
   library(wesanderson)
+  library(RColorBrewer)
 })
 
 
@@ -70,6 +71,7 @@ facet_labeller <- function(variable, value) {
   paste0(vlabel, " = ", value)
 }
 
+rdbu_cols <- brewer.pal(4, "RdBu")[c(1, 3, 4)]
 
 for (facet_var in facet_vars) {
   df_plot <- df %>% filter(!is.na(.data[[paste0(args$type, "_obs")]]))
@@ -84,16 +86,14 @@ for (facet_var in facet_vars) {
   
   if (args$type == "h2_ALS") {
     fill_var <- "K_ALS_input"
-    fill_levels <- sort(unique(df_plot[[fill_var]]))
-    darjeeling_cols <- wes_palette("Darjeeling1", length(fill_levels))
     
     p <- ggplot(df_plot, aes(x = factor(h2_ALS_input), y = h2_ALS_obs, fill = factor(.data[[fill_var]]))) +
-      geom_boxplot(position = position_dodge(width = 0.8), alpha = 0.7,
+      geom_boxplot(position = position_dodge(width = 0.8), alpha = 1.0,
                    outlier.shape = 16, outlier.size = 1) +
       facet_wrap(as.formula(paste("~", facet_var)), ncol = ncol_val,
                  labeller = facet_labeller) +
       scale_y_continuous(limits = c(0, y_max), breaks = pretty(c(0, y_max), n = 6)) +
-      scale_fill_manual(values = darjeeling_cols) +
+      scale_fill_manual(values = rdbu_cols) +
       labs(title = "(C) Polygenic h² ALS Validation",
            x = "Input h² ALS",
            y = "Observed h² ALS",
@@ -115,16 +115,14 @@ for (facet_var in facet_vars) {
       
   } else {  # K_ALS
     fill_var <- "h2_ALS_input"
-    fill_levels <- sort(unique(df_plot[[fill_var]]))
-    darjeeling_cols <- wes_palette("Darjeeling1", length(fill_levels))
-    
+
     p <- ggplot(df_plot, aes(x = factor(K_ALS_input), y = K_ALS_obs, fill = factor(.data[[fill_var]]))) +
-      geom_boxplot(position = position_dodge(width = 0.8), alpha = 0.7,
+      geom_boxplot(position = position_dodge(width = 0.8), alpha = 1.0,
                    outlier.shape = 16, outlier.size = 1) +
       facet_wrap(as.formula(paste("~", facet_var)), ncol = ncol_val,
                  labeller = facet_labeller) +
       scale_y_continuous(limits = c(0, y_max), breaks = pretty(c(0, y_max), n = 6)) +
-      scale_fill_manual(values = darjeeling_cols) +
+      scale_fill_manual(values = rdbu_cols) +
       labs(title = "(D) Polygenic Lifetime Risk ALS Validation",
            x = "Input K ALS",
            y = "Observed K ALS",
@@ -151,4 +149,4 @@ for (facet_var in facet_vars) {
 
 
 cat("\nAll polygenic validation plots saved as 9x3 PDFs\n")
-cat("Darjeeling1 palette used throughout\n")
+cat("RdBu palette used throughout (colours 1, 3, and 4 of RdBu-4)\n")

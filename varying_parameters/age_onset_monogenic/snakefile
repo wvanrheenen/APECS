@@ -1,5 +1,5 @@
 # Snakefile
-# command: snakemake -s snakefile --executor slurm --jobs 1500 --default-resources mem_mb=1000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 4 --slurm-keep-successful-logs all --forceall
+# command: snakemake -s snakefile --executor slurm --jobs 1500 --default-resources mem_mb=1000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 4 --slurm-keep-successful-logs all
 
 # Define the number of simulations and how many to run per job
 SETS = ["-10", "-5", "0", "5", "10"]

@@ -1,7 +1,7 @@
 # Skew-normal life expectancy 
 library(sn)
 library(ggplot2)
-library(wesanderson)
+library(RColorBrewer)
 library(dplyr)
 library(scales)
 
@@ -35,7 +35,8 @@ x <- seq(30, 110, length.out = 500)
 
 # Create data with CORRECT numeric life_exp
 plot_data <- data.frame()
-colors <- wes_palette(n = length(life_expectancy), name = "Darjeeling1")
+# First three colours from the four-colour ColorBrewer RdBu palette
+colors <- RColorBrewer::brewer.pal(4, "RdBu")[c(1, 3, 4)]
 
 for (i in seq_along(life_expectancy)) {
   omega_i <- get_omega(life_expectancy[i], max_age, k)
@@ -55,10 +56,13 @@ p <- ggplot(plot_data, aes(x = age, y = density, color = life_exp)) +
   scale_color_manual(values = colors, 
                      name = "Year of birth",
                      labels = year_labels) +
-  labs(title = "(B) Left Skewed Life Expectancy Distributions",
-       x = "Life expectancy (years)", y = "Density") +
-  scale_x_continuous(breaks = seq(40, 100, 10)) +      
-  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +  
+  labs(title = "(B) Life Expectancy Distributions",
+      x = "Life expectancy (years)", y = "Density") +
+  scale_x_continuous(breaks = seq(40, 100, 10)) +
+  scale_y_continuous(
+    breaks = c(0, 0.05, 0.10),
+    labels = c("0", "0.05", "0.1")
+  ) +
   coord_cartesian(xlim = c(45, 100), ylim = c(0, 0.13)) +
   theme_bw() +
   theme(
@@ -75,6 +79,6 @@ p <- ggplot(plot_data, aes(x = age, y = density, color = life_exp)) +
     panel.grid.minor = element_blank()
   )
 
-ggsave("life_exp_distr.pdf", p, width = 3, height = 3, units = "in", dpi = 300)
+ggsave("life_exp_distr.pdf", p, width = 3, height = 3, units = "in", dpi = 600)
 
 cat("✓ life_exp_distr.pdf - FIXED legend shows correct 60/75/90 years ✓\n")

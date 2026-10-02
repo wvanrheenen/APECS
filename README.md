@@ -1,4 +1,4 @@
-# SimPlex
+# APECS
 A framework to simulate ALS and ALS-associated disease under a monogenic/Mendelian and polygenic/complex disease model.
 
 ## Github Architecture
@@ -11,7 +11,7 @@ This is a list of the subdirectories in our main github page:
   - This directory contains the main functions required to run all analyses. 
   - Further subdirectories contain adaptations of the main functions found in this src directory. 
 - varying_parameters:
-  - This directory contains the files needed for the sensitivity analyses in our main article.
+  - This directory contains the files needed for the sensitivity analyses and demographic changes analyses in our main article.
 - rationale:
   - This directory contains the data required to validate whether the simulations match input parameters, real world demographic data and if the simulations actually simulate phenotypic traits as is expected.
   - A separate README.md file is available for explanation on each rationale step.
@@ -19,6 +19,8 @@ This is a list of the subdirectories in our main github page:
   - This directory contains gathered and processed real world demographic and genetic data required as input to run the simulations.
 - ALPINE_plug:
   - This directory contains a pipeline needed to run analyses on cryptic distant relatives in monogenic index patient pedigrees.
+- rshiny_slider:
+  - This directory contains the pipeline used to generate the 'Variable parameters' tab of the web-based probability calculator
 
 ## Setup
 ### Snakefile
@@ -27,13 +29,13 @@ This is a list of the subdirectories in our main github page:
 #### Installation (Conda - Recommended)
 ```bash
 # Install snakemake + SLURM executor plugin
-conda create -n simplex_snakemake -c conda-forge -c bioconda snakemake snakemake-executor-plugin-slurm
-conda activate simplex_snakemake
+conda create -n APECS_snakemake -c conda-forge -c bioconda snakemake snakemake-executor-plugin-slurm
+conda activate APECS_snakemake
 ```
 
 #### Run Pipeline (Login Node Only)
 ```bash
-conda activate simplex_snakemake
+conda activate APECS_snakemake
 
 # This commnand can be applied for all snakefiles in this github; change the -s {snakefile_name} to the correct name where necessary for parallelization
 snakemake -s snakefile --executor slurm --jobs 500 \

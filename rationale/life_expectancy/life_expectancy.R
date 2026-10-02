@@ -97,8 +97,13 @@ p <- ggplot() +
   scale_x_continuous(breaks = c(1850, 1900, 1950, 2000, 2050)) +
   labs(title = "(A) Historical vs. simulated life expectancy",
        x = "Year of Birth", y = "Life Expectancy") +
-  scale_color_manual(values = wes_palette(n = 2, name = "Darjeeling1"),
-                     name = "Data") +
+  scale_color_manual(
+    values = c(
+      "Historical" = RColorBrewer::brewer.pal(4, "RdBu")[1],
+      "Simulated" = RColorBrewer::brewer.pal(4, "RdBu")[4]
+    ),
+    name = "Data"
+  ) +
   theme_bw() +
   theme(legend.position = "top",
         plot.title = element_text(size = 10, hjust = 0.5, face="bold", margin = margin(b = 5)),

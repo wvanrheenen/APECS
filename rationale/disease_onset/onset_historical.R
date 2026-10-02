@@ -1,7 +1,7 @@
 #' make sure warnings are treated as errors
 options(warn = 1)
 source("../../src/libraries_simPed.R")
-library(wesanderson)
+library(RColorBrewer)
 
 # Read age_of_onset data
 disease_onset <- read.csv("../../data/age_of_onset/age_of_onset.csv", header = TRUE)
@@ -30,18 +30,31 @@ disease_long$disease <- factor(disease_long$disease,
                                levels = new_order,
                                labels = new_labels)
                                
-# Darjeeling1 palette extended for 5 diseases
-darjeeling_cols <- c(
-  wes_palette("Darjeeling1"),
-  "#7B68EE"   # manually added sixth color
+# Six-class ColorBrewer RdBu palette
+rdbu_cols <- RColorBrewer::brewer.pal(8, "RdBu")
+
+# Explicit disease mapping:
+# ALS: darkest red / darkest blue
+# FTD: medium red / medium blue
+# Dementia: lightest red / lightest blue
+disease_cols <- c(
+  "Monogenic ALS"       = rdbu_cols[1],
+  "Polygenic ALS"       = rdbu_cols[8],
+  "Monogenic FTD"       = rdbu_cols[2],
+  "Polygenic FTD"       = rdbu_cols[7],
+  "Monogenic Dementia"  = rdbu_cols[3],
+  "Polygenic Dementia"  = rdbu_cols[6]
 )
+
 
 p <- ggplot(disease_long, aes(x = age, y = probability, color = disease)) +
   geom_line(linewidth = 1) +
   labs(title = "(A) Historical Disease Onset",
        x = "Age at Onset (years)", y = "Density") +
-  scale_color_manual(values = darjeeling_cols,
-                     name = "Disease") +
+  scale_color_manual(
+    values = disease_cols,
+    name = "Disease"
+  ) +
   scale_y_continuous(labels = scales::number_format(accuracy = 0.01)) +
   coord_cartesian(xlim = c(20, 100)) +
   theme_bw() +
@@ -60,4 +73,4 @@ ggsave("historical_disease_onset_9x3.pdf", p,
        width = 9, height = 3, units = "in", dpi = 300)
 
 cat("Historical disease onset plot saved as PDF\n")
-cat("Darjeeling1 palette used for 6 diseases\n")
+cat("RdBu-6 palette used for 6 disease-onset distributions\n")

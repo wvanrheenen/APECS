@@ -1,12 +1,12 @@
 # Snakefile
-# command: snakemake -s snakefile --executor slurm --jobs 2500 --default-resources mem_mb=1000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 1 --slurm-keep-successful-logs all
+# command: snakemake -s snakefile --executor slurm --jobs 500 --default-resources mem_mb=1000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 1 --slurm-keep-successful-logs all
 
 
 # Define the number of simulations and how many to run per job
-TOTAL_SIMULATIONS = 1000000
-SIMULATIONS_PER_JOB = 2500
+TOTAL_SIMULATIONS = 1000000 
+SIMULATIONS_PER_JOB = 2000 
 
-SETS = ["phenocopies"]
+SETS = ["main_simulation"]
 
 rule all:
     input:

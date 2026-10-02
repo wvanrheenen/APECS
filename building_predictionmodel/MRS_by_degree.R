@@ -26,8 +26,8 @@ group_counts <- df_grouped %>% count(group) %>% deframe()
 
 group_names <- c(
   "Polygenic ALS" = "Polygenic ALS",
-  "Common Monogenic ALS" = "Common\nMonogenic ALS",
-  "Rare Monogenic ALS" = "Rare, pathogenic\nMonogenic ALS"
+  "Common Monogenic ALS" = "Moderate penetrance\nMonogenic ALS",
+  "Rare Monogenic ALS" = "High penetrance\nMonogenic ALS"
 )
 
 group_labels <- setNames(
@@ -169,8 +169,6 @@ for (disease_key in names(disease_scenarios)) {
   # Combine into single figure
   combined_plot <- wrap_plots(plots, ncol = 1) +
     plot_annotation(
-      title = paste0("Figure 4: Distribution of ", disease_info$name, " in index patients"),
-      subtitle = "Proportion of affected relatives across increasing kinship distance",
       theme = theme(
         plot.title = element_text(size = 13, hjust = 0.6, face = "bold"),
         plot.subtitle = element_text(size = 11, hjust = 0.6)
@@ -179,6 +177,6 @@ for (disease_key in names(disease_scenarios)) {
   
   # Save
   filename <- paste0("mrs_relatives/", tolower(disease_key), "_degree_mrs_plots.pdf")
-  ggsave(filename, combined_plot, width = 12, height = 11)
+  ggsave(filename, combined_plot, width = 9, height = 11, dpi = 600)
   cat("✔", disease_info$name, "plots saved to", filename, "\n")
 }

@@ -29,8 +29,8 @@ rule run_simulation:
     params:
         set = lambda wildcards: wildcards.set  
     resources:
-        runtime = 86400,
-        mem_mb=lambda wildcards: 5000 if (
+        runtime = 900,
+        mem_mb=lambda wildcards: 2500 if (
             wildcards.set == "alpine"
         ) else 2500,
     shell:

@@ -2,6 +2,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(wesanderson)
+library(RColorBrewer)
 
 # Link to data for mean fert rate based on birth year
 fert_rate = read.table("../../data/fertility_rate/Gapminder/GM_fertility_rate_Netherlands_1800_2100.txt", header=T)
@@ -21,7 +22,8 @@ sizes <- 5
 
 # Create NB data
 plot_data <- data.frame()
-colors <- wes_palette(n = length(fertility_rate), name = "Darjeeling1")
+# First three colours from the four-colour ColorBrewer RdBu palette
+colors <- RColorBrewer::brewer.pal(4, "RdBu")[c(1, 3, 4)]
 
 for (i in seq_along(fertility_rate)) {
   m <- fertility_rate[i]
@@ -52,9 +54,12 @@ p <- ggplot(plot_data, aes(x = offspring, y = prob, color = year_label)) +
     name = "Year of birth",
     labels = year_labels
   ) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+  scale_y_continuous(
+    breaks = c(0, 0.1, 0.2, 0.3),
+    labels = c("0", "0.1", "0.2", "0.3")
+  ) +
   labs(
-    title = "(B) Negative Binomial Fertility Rate Distributions",
+    title = "(B) Fertility Rate Distributions",
     x = "Number of Offspring",
     y = "Density"
   ) +

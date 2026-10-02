@@ -721,7 +721,7 @@ add_pheno = function(df_ped, disease_onset, penetrance_ALS_common, penetrance_AL
   return(df_ped)
 }
 
-#' function to check if monogenic index patients and their monogenic affected relatives have the same common ancestor of their disease allele (i.e. phenocopy trakcer)
+#' function to check if monogenic index patients and their monogenic affected relatives have the same common ancestor of their disease allele (i.e. phenocopy tracker)
 # Compare disease-allele labels between two individuals
 # Returns TRUE if both are monogenic ALS and their label sets differ
 has_different_monogenic_ancestry <- function(df, index_id, sib_id) {

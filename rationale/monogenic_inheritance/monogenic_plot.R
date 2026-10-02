@@ -48,12 +48,12 @@ penetrance_labels <- setNames(
   levels(df$penetrance)
 )
 
-# Darjeeling1 palette (matching disease_onset.R)
-darjeeling_cols <- wes_palette("Darjeeling1", 2)
+# rdbu_cols palette (matching disease_onset.R)
+rdbu_cols <- RColorBrewer::brewer.pal(4, "RdBu")[c(1, 4)]
 
 # Plot with disease_onset.R matching theme
 p <- ggplot(df, aes(x = generation, y = simulated_proportion, fill = lambda)) +
-  geom_boxplot(position = position_dodge(width = 0.8), alpha = 0.7, 
+  geom_boxplot(position = position_dodge(width = 0.8), alpha = 1.0, 
                outlier.shape = 16, outlier.size = 1) +
   # geom_segment(
   #   data = expected_segments,
@@ -69,7 +69,7 @@ p <- ggplot(df, aes(x = generation, y = simulated_proportion, fill = lambda)) +
     y = "Proportion affected offspring",
     fill = "Fertility rate"
   ) +
-  scale_fill_manual(values = darjeeling_cols) +
+  scale_fill_manual(values = rdbu_cols) +
   scale_y_continuous(labels = percent_format(accuracy = 0.1), limits = c(0, NA)) +
   coord_cartesian(xlim = c(0.5, max(as.numeric(levels(df$generation))) + 0.5)) +
   theme_bw() +
@@ -90,4 +90,7 @@ p <- ggplot(df, aes(x = generation, y = simulated_proportion, fill = lambda)) +
 ggsave(output_pdf, p, width = 9, height = 3, units = "in", dpi = 300)
 
 cat("Monogenic inheritance plot saved as 9x3 PDF\n")
-cat("Darjeeling1 palette: λ=1.5 =", darjeeling_cols[1], ", λ=2 =", darjeeling_cols[2], "\n")
+cat(
+  "RdBu palette: λ=1.5 =", rdbu_cols[1],
+  ", λ=3 =", rdbu_cols[2], "\n"
+)

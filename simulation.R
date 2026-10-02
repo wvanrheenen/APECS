@@ -19,25 +19,25 @@ life_expectancy = read.table(file.path(script_dir, "/data/life_expectancy_at_fif
 current_year = 2025
 disease_onset = read.csv(file.path(script_dir, "/data/age_of_onset/age_of_onset.csv"), header = T)
 
-DAF_common = 0.00075 # Disease allele frequency, closer to Douglas 2024 than Van Wijk 2024
-DAF_patho = 0.00012 # Derived from Douglas 2024 + Gnomad (SOD1+FUS)
-DAF_ftd = 0.00015 # Derived from Gnomad (GRN+MAPT)
-penetrance_ALS_common = 0.21 # derived from Van Wijk 2024 (24%), Gao 2025
-penetrance_ALS_patho = 0.50 # derived from Douglas 2024 (FUS 19%, SOD1 54%)
-h2_ALS = 0.40 # additive polygenic heritability, derived from vRheenen; Russel 2019; lowered for polygenic proportion
-K_ALS = (0.00267 * 0.85) # derived from Ryan 2019, 1/375 = 0.0027. Corrected for 15% monogenic. 
-penetrance_FTD_common = 0.1  # derived from Gao 2025
-penetrance_FTD_patho = 0.1 # copied from Gao 2025
+DAF_common = 0.00075 
+DAF_patho = 0.00012 
+DAF_ftd = 0.00015
+penetrance_ALS_common = 0.21 
+penetrance_ALS_patho = 0.50 
+h2_ALS = 0.40 
+K_ALS = (0.00267 * 0.85) 
+penetrance_FTD_common = 0.1 
+penetrance_FTD_patho = 0.1
 penetrance_FTD_nonALS = 0.9 
-h2_FTD = 0.45 # additive polygenic heritability, Dijkstra 2025
-K_FTD = (0.00134 * 0.75) # derived from Coyle-Gilchrist 2016, 1 in 750 = 0.0013, corrected for 25% monogenic. 
-penetrance_dem_common = 0.5 # derived from Gao 2025, bit lower
-penetrance_dem_patho = 0.1 # guestimate, no data
-K_dementia = 0.418 # derived from Fang 2025 
-h2_dementia = 0.55 # Dijkstra 2025; lowered to compensate for prevalence of e.g. vascular dementia
-rg_ALSFTD = 0.6 # vRheenen 2021
-rg_ALSdem = 0.25 # vRheenen 2021, Wainberg 2023, Chen 2024
-rg_FTDdem = 0.35 # vRheenen 2021, Chen 2024
+h2_FTD = 0.45 
+K_FTD = (0.00134 * 0.75) 
+penetrance_dem_common = 0.5 
+penetrance_dem_patho = 0.1 
+K_dementia = 0.418
+h2_dementia = 0.55 
+rg_ALSFTD = 0.6 
+rg_ALSdem = 0.25 
+rg_FTDdem = 0.35 
 plot = FALSE # Do not plot pedigree
 
 yob_index_min = 1940

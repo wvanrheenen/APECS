@@ -352,8 +352,8 @@ relatives_2nd_ALSdem_unaffected 2.676527e-02
 relatives_3rd_ALSdem_unaffected 1.775377e-03
 
 -----------------------------------------
-ROC plots saved as 4x4 PDFs with Darjeeling1 Wes Anderson palette
-ROC plots saved as one combined PDF with Darjeeling1 Wes Anderson palette
+ROC plots saved as 4x4 PDFs with the four-colour RdBu palette
+ROC plots saved as one combined PDF with the four-colour RdBu palette
 
 ==============================
 Model: ALS model including unaffected individuals 

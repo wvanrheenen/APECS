@@ -2,9 +2,9 @@
 
 ## PPV_grid.R
 ## Usage:
-## Rscript scripts/PPV_grid.R ../results/PPV_grid/combined_simulations.csv \
-##                    output_ppv_als_grid.csv \
-##                    output_ppv_alsftd_grid.csv
+##   Rscript PPV_grid.R input_combined_simulations.csv \
+##                      output_ppv_als_grid.csv \
+##                      output_ppv_alsftd_grid.csv
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -13,7 +13,7 @@ suppressPackageStartupMessages({
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 3) {
-  stop("Usage: Rscript scripts/PPV_grid.R <input_combined_simulations.csv> <output_ppv_als_grid.csv> <output_ppv_alsftd_grid.csv>")
+  stop("Usage: Rscript PPV_grid.R <input_combined_simulations.csv> <output_ppv_als_grid.csv> <output_ppv_alsftd_grid.csv>")
 }
 
 input_file         <- args[1]
@@ -106,7 +106,7 @@ calculate_ppv_for_combinations <- function(results_df, vars, max_count = 4, conf
       PPV         = round(ppv_mat[, 1], 3),
       PPV_CI_low  = round(ppv_mat[, 2], 3),
       PPV_CI_high = round(ppv_mat[, 3], 3),
-      prevalence  = sprintf("%d out of %d simulated index patients", n, total_n),
+      prevalence  = sprintf("%d out of %d patients", n, total_n),
       criterion_label = criterion_label
     ) %>%
     arrange(

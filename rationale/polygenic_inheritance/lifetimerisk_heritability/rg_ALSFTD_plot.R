@@ -6,6 +6,7 @@ suppressPackageStartupMessages({
   library(readr)
   library(scales)
   library(wesanderson)
+  library(RColorBrewer)
 })
 
 
@@ -52,6 +53,7 @@ facet_labeller <- function(variable, value) {
 
 # ---- plotting ----
 facet_vars <- args$facets
+rdbu_cols <- RColorBrewer::brewer.pal(4, "RdBu")[c(1, 3, 4)]
 
 for (facet_var in facet_vars) {
   df_plot <- df
@@ -64,12 +66,12 @@ for (facet_var in facet_vars) {
   
   p <- ggplot(df_plot, aes(x = factor(rg_ALSFTD_input), y = rg_ALS_FTD_obs, 
                           fill = factor(.data[[facet_var]]))) +
-    geom_boxplot(position = position_dodge(width = 0.8), alpha = 0.7,
+    geom_boxplot(position = position_dodge(width = 0.8), alpha = 1.0,
                  outlier.shape = 16, outlier.size = 1) +
     facet_wrap(as.formula(paste("~ h2_ALS_input")), ncol = 4,
                labeller = facet_labeller) +    # not labeller(…=…); just pass the function
     scale_y_continuous(limits = c(0, y_max), breaks = pretty(c(0, y_max), n = 6)) +
-    scale_fill_manual(values = darjeeling_cols) +
+    scale_fill_manual(values = rdbu_cols) +
     labs(title = "(E) Genetic Correlation ALS~FTD Validation",
          x = "Input genetic correlation",
          y = "Observed correlation",
@@ -95,4 +97,4 @@ for (facet_var in facet_vars) {
 
 
 cat("\nAll genetic correlation plots saved as 9x3 PDFs\n")
-cat("Darjeeling1 palette used throughout\n")
+cat("RdBu palette used throughout (colours 1, 3, and 4 of RdBu-4)\n")

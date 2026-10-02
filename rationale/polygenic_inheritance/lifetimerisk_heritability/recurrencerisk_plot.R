@@ -6,6 +6,7 @@ suppressPackageStartupMessages({
   library(readr)
   library(scales)
   library(wesanderson)
+  library(RColorBrewer)
 })
 
 # ---- argument parsing ----
@@ -42,6 +43,7 @@ nice_facet_label <- function(variable, value) {
   paste0(var_label, " = ", value)
 }
 
+rdbu_cols <- brewer.pal(4, "RdBu")[c(1, 3, 4)]
 
 for(fill_var in fill_options) {
   # K_ALS row (1 row × 3 cols)
@@ -49,11 +51,11 @@ for(fill_var in fill_options) {
     mutate(x_label = paste0("RR=", lambda1_theor, "\n(h2 ALS=", h2_ALS_input, ")"))
   
   p_kals <- ggplot(df_kals, aes(x = factor(lambda1_theor), y = lambda1_emp, fill = factor(.data[[fill_var]]))) +
-    geom_boxplot(position = position_dodge(width = 0.8), alpha = 0.7,
+    geom_boxplot(position = position_dodge(width = 0.8), alpha = 1.0,
                  outlier.shape = 16, outlier.size = 1) +
     facet_wrap(~ K_ALS_input, nrow = 1, ncol = 3, scales = "free",
                labeller = nice_facet_label) +
-    scale_fill_manual(values = wes_palette("Darjeeling1")) +
+    scale_fill_manual(values = rdbu_cols) +
     scale_x_discrete(labels = function(x) unique(df_kals$x_label[as.character(df_kals$lambda1_theor) == x])) +
     labs(title = "(B) Polygenic Recurrence Risk Validation",
          x = "Theoretical Recurrence Risk", y = "Observed RR",
@@ -81,11 +83,11 @@ for(fill_var in fill_options) {
     mutate(x_label = paste0("RR=", lambda1_theor, "\n(K ALS=", K_ALS_input, ")"))
   
   p_h2als <- ggplot(df_h2als, aes(x = factor(lambda1_theor), y = lambda1_emp, fill = factor(.data[[fill_var]]))) +
-    geom_boxplot(position = position_dodge(width = 0.8), alpha = 0.7,
+    geom_boxplot(position = position_dodge(width = 0.8), alpha = 1.0,
                  outlier.shape = 16, outlier.size = 1) +
     facet_wrap(~ h2_ALS_input, nrow = 1, ncol = 3, scales = "free",
                labeller = nice_facet_label) +
-    scale_fill_manual(values = wes_palette("Darjeeling1")) +
+    scale_fill_manual(values = rdbu_cols) +
     scale_x_discrete(labels = function(x) unique(df_h2als$x_label[as.character(df_h2als$lambda1_theor) == x])) +
     labs(title = "(B) Polygenic Recurrence Risk Validation",
          x = "Theoretical Recurrence Risk", y = "Observed RR",
@@ -113,4 +115,4 @@ for(fill_var in fill_options) {
 
 
 cat("\nAll recurrence risk λ₁ plots saved as 9x3 PDFs\n")
-cat("Darjeeling1 palette used throughout\n")
+cat("RdBu palette used throughout (colours 1, 3, and 4 of RdBu-4)\n")

@@ -1,0 +1,117 @@
+# Snakefile
+# command: snakemake -s snakefile --executor slurm --jobs 5000 --default-resources mem_mb=5000 runtime=900 constraint="avx2" --rerun-incomplete --keep-going --latency-wait 90 --cores 1 --slurm-keep-successful-logs all
+
+
+# Define the number of simulations and how many to run per job
+TOTAL_SIMULATIONS = 10000000
+SIMULATIONS_PER_JOB = 25000
+
+SETS = ["rshiny_slider"]
+ALSFTD_COMMON = ["0.10", "0.20", "0.30", "0.40", "0.50"]
+ALSFTD_RARE = ["0.30", "0.40", "0.50", "0.60", "0.70"]
+H2_ALS = ["0.20", "0.30", "0.40", "0.50", "0.60"]
+
+CHUNKS = range(0, TOTAL_SIMULATIONS, SIMULATIONS_PER_JOB)
+
+rule all:
+    input:
+        # expand("results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/combined_simulations.csv", 
+        #     set=SETS, ALSFTD_COMMON=ALSFTD_COMMON, ALSFTD_RARE=ALSFTD_RARE, H2_ALS=H2_ALS),
+        # expand("results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/combined_metrics.csv", 
+        #     set=SETS, ALSFTD_COMMON=ALSFTD_COMMON, ALSFTD_RARE=ALSFTD_RARE, H2_ALS=H2_ALS),
+        # expand("results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/prediction_model.csv", 
+        #     set=SETS, ALSFTD_COMMON=ALSFTD_COMMON, ALSFTD_RARE=ALSFTD_RARE, H2_ALS=H2_ALS),
+        expand("results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/output_ppv_als_grid.csv", 
+            set=SETS, ALSFTD_COMMON=ALSFTD_COMMON, ALSFTD_RARE=ALSFTD_RARE, H2_ALS=H2_ALS),
+        expand("results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/output_ppv_alsftd_grid.csv", 
+            set=SETS, ALSFTD_COMMON=ALSFTD_COMMON, ALSFTD_RARE=ALSFTD_RARE, H2_ALS=H2_ALS),
+        "varying_param_als_grid.csv",
+        "varying_param_alsftd_grid.csv"            
+
+# rule install_packages:
+#     output:
+#         touch("logs/packages_installed.txt")
+#     script:
+#         "src/install_packages.R"
+
+# rule run_simulation:
+#     input:
+#         packages = "logs/packages_installed.txt"
+#     output:
+#         results = "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/simulations/simulation_{chunk}.csv",
+#         metrics = "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/metrics/metrics_{chunk}.csv",
+#     threads: 2
+#     params:
+#         set = lambda wildcards: wildcards.set
+#     resources:
+#         mem_mb = 5000
+#     shell:
+#         "Rscript simulation.R {params.set} {wildcards.chunk} {SIMULATIONS_PER_JOB} {wildcards.ALSFTD_COMMON} {wildcards.ALSFTD_RARE} {wildcards.H2_ALS}"
+
+# def simulation_files(wildcards):
+#     return expand(
+#         "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/simulations/simulation_{chunk}.csv",
+#         set=[wildcards.set],
+#         ALSFTD_COMMON=[wildcards.ALSFTD_COMMON],
+#         ALSFTD_RARE=[wildcards.ALSFTD_RARE],
+#         H2_ALS=[wildcards.H2_ALS],
+#         chunk=CHUNKS
+#     )
+
+
+# def metrics_files(wildcards):
+#     return expand(
+#         "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/metrics/metrics_{chunk}.csv",
+#         set=[wildcards.set],
+#         ALSFTD_COMMON=[wildcards.ALSFTD_COMMON],
+#         ALSFTD_RARE=[wildcards.ALSFTD_RARE],
+#         H2_ALS=[wildcards.H2_ALS],
+#         chunk=CHUNKS
+#     )
+
+
+# rule combine_results:
+#     input:
+#         results = simulation_files,
+#         metrics = metrics_files,
+#     output:
+#         combined_results = "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/combined_simulations.csv",
+#         combined_metrics = "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/combined_metrics.csv",
+#         prediction_model = "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/prediction_model.csv",
+#     params:
+#         set = lambda wildcards: wildcards.set
+#     resources:
+#         mem_mb = 50000        
+#     script:
+#         "src/combine_results.R"
+
+rule ppv_grid:
+    input:
+        combined = "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/combined_simulations.csv",
+    output:
+        als_grid    = "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/output_ppv_als_grid.csv",
+        alsftd_grid = "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/output_ppv_alsftd_grid.csv",
+    resources:
+        mem_mb = 5000,
+        runtime = 60
+    shell:
+        "Rscript src/PPV_grid.R {input.combined} {output.als_grid} {output.alsftd_grid}"
+
+rule combine_ppv_grids:
+    input:
+        als_grids = expand(
+            "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/output_ppv_als_grid.csv",
+            set=SETS, ALSFTD_COMMON=ALSFTD_COMMON, ALSFTD_RARE=ALSFTD_RARE, H2_ALS=H2_ALS
+        ),
+        alsftd_grids = expand(
+            "results/{set}/ALSFTD_common_{ALSFTD_COMMON}_ALSFTD_rare_{ALSFTD_RARE}_h2als_{H2_ALS}/output_ppv_alsftd_grid.csv",
+            set=SETS, ALSFTD_COMMON=ALSFTD_COMMON, ALSFTD_RARE=ALSFTD_RARE, H2_ALS=H2_ALS
+        )
+    output:
+        als = "varying_param_als_grid.csv",
+        alsftd = "varying_param_alsftd_grid.csv"
+    resources:
+        mem_mb = 10000,
+        runtime = 60
+    script:
+        "src/combine_ppv_grids.R"        

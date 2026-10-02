@@ -8,7 +8,7 @@ install_if_missing <- function(pkg) {
   library(pkg, character.only = TRUE)
 }
 
-packages <- c("dplyr", "glmnet", "DescTools", "ROCR", "rcompanion", "car", "pROC", "boot", "caret",
+packages <- c("dplyr", "glmnet", "DescTools", "ROCR", "rcompanion", "car", "pROC", "boot", "caret", "RColorBrewer",
               "ggplot2", "reshape2", "gridExtra", "grid", "cowplot", "PRROC", "patchwork", "wesanderson", "purrr")
 options(repos = c(CRAN = "https://cloud.r-project.org/"))  # Set CRAN mirror
 
@@ -298,8 +298,8 @@ roc_list3 <- list(
   "ALS+dementia+unaffected" = roc(results_df$mendel_ALS_Y, predict(model_dementia_unaffected, type="response"))
 )
 
-# select colors
-darjeeling_cols <- wesanderson::wes_palette("Darjeeling1", 4, type = "continuous")
+# Four-class colourblind-friendly ColorBrewer RdBu palette
+rdbu_cols <- RColorBrewer::brewer.pal(4, "RdBu")
 
 plot_roc_curves <- function(roc_list, title = "ROC Curves", subtitle = NULL, model_labels = NULL) {
   plot_df <- do.call(rbind, lapply(names(roc_list), function(n) {
@@ -335,7 +335,7 @@ plot_roc_curves <- function(roc_list, title = "ROC Curves", subtitle = NULL, mod
          x = "Specificity", 
          y = "Sensitivity") +
     scale_color_manual(
-      values = darjeeling_cols[1:length(unique(plot_df$model))],
+      values = rdbu_cols[1:length(unique(plot_df$model))],
       labels = auc_df$label,
       guide = guide_legend(nrow = length(unique(plot_df$model)), byrow = TRUE)
     ) +
@@ -412,7 +412,7 @@ roc_plot3 <- plot_roc_curves(
 
 ggsave("roccurves_trainingset/roc_step3_unaffected.pdf", roc_plot3, width = 4.5, height = 4, units = "in", dpi = 300)
 
-cat("ROC plots saved as 4x4 PDFs with Darjeeling1 Wes Anderson palette\n")
+cat("ROC plots saved as 4x4 PDFs with the four-colour RdBu palette\n")
 
 # Combine into one figure
 combined_roc_plot <- wrap_plots(roc_plot1, roc_plot2, roc_plot3, ncol = 3) +
@@ -435,7 +435,7 @@ ggsave(
   dpi = 300
 )
 
-cat("ROC plots saved as one combined PDF with Darjeeling1 Wes Anderson palette\n")
+cat("ROC plots saved as one combined PDF with the four-colour RdBu palette\n")
 
 ## Part 2: crossvalidation of the trainingset
 
@@ -778,7 +778,7 @@ print(best_youdens_j)
 library(ggplot2)
 f1_plot <- ggplot(metrics_df, aes(x = threshold, y = F1, color = model)) +
   geom_line(size = 1.1) +
-  scale_color_manual(values = darjeeling_cols[1:length(unique(metrics_df$model))]) +
+  scale_color_manual(values = rdbu_cols[1:length(unique(metrics_df$model))]) +
   labs(title = "Optimal F1 Score Threshold", x = "Threshold", y = "F1 Score") +
   theme_bw(base_size = 10) +
   theme(
@@ -835,7 +835,7 @@ plot_roc_curves <- function(roc_list, title = "ROC Curves", subtitle = NULL, mod
          x = "Specificity", 
          y = "Sensitivity") +
     scale_color_manual(
-      values = darjeeling_cols[1:length(unique(plot_df$model))],
+      values = rdbu_cols[1:length(unique(plot_df$model))],
       labels = auc_df$label,
       guide = guide_legend(nrow = length(unique(plot_df$model)), byrow = TRUE)
     ) +

@@ -1,5 +1,5 @@
 #' ---
-#' title: "SimPlex: a simulation scheme for pedigrees with Mendelian and complex traits"
+#' title: "APECS: a simulation scheme for pedigrees with Mendelian and complex traits"
 #' output: github_document
 #' author: Wouter van Rheenen, Paul Beele
 #' date: "`r format(Sys.time(), '%d %B %Y')`"

@@ -6,6 +6,8 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(wesanderson)
+library(RColorBrewer)
+
 
 # Read command line args: input_file output_dir
 args <- commandArgs(trailingOnly = TRUE)
@@ -20,6 +22,13 @@ data <- read.csv(input_file, stringsAsFactors = FALSE)
 
 # Time grid
 time_grid <- seq(0, 20, by = 0.1)
+
+# Four-class ColorBrewer RdBu palette
+rdbu4 <- RColorBrewer::brewer.pal(4, "RdBu")
+cols_emp_sim <- c(
+  "Empirical" = rdbu4[1],
+  "Simulated" = rdbu4[4]
+)
 
 ########################################
 # (A) ALS
@@ -39,14 +48,11 @@ als_sim <- data %>%
 
 als_df <- bind_rows(als_emp, als_sim)
 
-cols_als <- c("Empirical" = wes_palette("Darjeeling1")[1],
-              "Simulated" = wes_palette("Darjeeling1")[2])
-
 p_als <- ggplot(als_df, aes(x = time, y = density, color = type)) +
   geom_line(linewidth = 1) +
   labs(title = "(A) Empirical vs. Simulated ALS Survival",
        x = "Time Since Onset (years)", y = "Density") +
-  scale_color_manual(values = cols_als, name = "") +
+  scale_color_manual(values = cols_emp_sim, name = "") +
   coord_cartesian(xlim = c(0, 20)) +
   theme_bw() +
   theme(legend.position = "top",
@@ -78,14 +84,11 @@ ftd_sim <- data %>%
 
 ftd_df <- bind_rows(ftd_emp, ftd_sim)
 
-cols_ftd <- c("Empirical" = wes_palette("Darjeeling1")[1],
-              "Simulated" = wes_palette("Darjeeling1")[2])
-
 p_ftd <- ggplot(ftd_df, aes(x = time, y = density, color = type)) +
   geom_line(linewidth = 1) +
   labs(title = "(B) Empirical vs. Simulated FTD Survival",
        x = "Time Since Onset (years)", y = "Density") +
-  scale_color_manual(values = cols_ftd, name = "") +
+  scale_color_manual(values = cols_emp_sim, name = "") +
   coord_cartesian(xlim = c(0, 20)) +
   theme_bw() +
   theme(legend.position = "top",
@@ -102,6 +105,10 @@ ggsave(file.path(output_dir, "ftd_survival_3x3.pdf"), p_ftd,
 ########################################
 # (C) Dementia
 ########################################
+
+# Eleven-class ColorBrewer RdBu palette
+rdbu11 <- RColorBrewer::brewer.pal(11, "RdBu")
+
 data_dem <- data %>%
   filter(!is.na(post_surv_dem), !is.na(age_dementia)) %>%
   mutate(age_group = case_when(
@@ -128,33 +135,54 @@ dem_sim <- data_dem %>%
   mutate(type = "Simulated")
 
 dem_df <- bind_rows(dem_emp, dem_sim) %>%
-  mutate(group_type = paste(age_group, type, sep = " - "))
+  mutate(
+    age_group = factor(
+      age_group,
+      levels = c("<70", "70–79", "80–89", "90+")
+    ),
+    type = factor(
+      type,
+      levels = c("Empirical", "Simulated")
+    ),
+    group_type = factor(
+      paste(age_group, type, sep = " - "),
+      levels = c(
+        "<70 - Empirical", "<70 - Simulated",
+        "70–79 - Empirical", "70–79 - Simulated",
+        "80–89 - Empirical", "80–89 - Simulated",
+        "90+ - Empirical", "90+ - Simulated"
+      )
+    )
+  )
 
-# Hardcoded Darjeeling1 first 4 colors
-darjeeling_base <- c("#FF0000", "#00A08A", "#F2AD00", "#F98400")
 
-# Hardcoded darker versions for simulated (dashed)
-darjeeling_dark <- c("#940101", "#00800d", "#bfc200", "#b95f00")
-
+# Dementia: empirical = red shades; simulated = blue shades.
+# Colours darken with later onset age.
 cols_dem <- c(
-  "<70 - Empirical" = darjeeling_base[1],
-  "70–79 - Empirical" = darjeeling_base[2],
-  "80–89 - Empirical" = darjeeling_base[3],
-  "90+ - Empirical" = darjeeling_base[4],
-  "<70 - Simulated" = darjeeling_dark[1],
-  "70–79 - Simulated" = darjeeling_dark[2],
-  "80–89 - Simulated" = darjeeling_dark[3],
-  "90+ - Simulated" = darjeeling_dark[4]
+  "<70 - Empirical"   = rdbu11[5],
+  "<70 - Simulated"   = rdbu11[8],
+  "70–79 - Empirical" = rdbu11[4],
+  "70–79 - Simulated" = rdbu11[9],
+  "80–89 - Empirical" = rdbu11[3],
+  "80–89 - Simulated" = rdbu11[10],
+  "90+ - Empirical"   = rdbu11[2],
+  "90+ - Simulated"   = rdbu11[11]
 )
+
 
 p_dem <- ggplot(dem_df, aes(x = time, y = density, color = group_type, linetype = type)) +
   geom_line(linewidth = 1) +
   labs(title = "(C) Empirical vs. Simulated Dementia Survival",
        subtitle = "Survival after onset dependent on age at onset",  # Added subtitle
        x = "Time Since Onset (years)", y = "Density") +
-  scale_color_manual(values = cols_dem, name = "Group") +
-  scale_linetype_manual(values = c("Empirical" = "solid", "Simulated" = "dashed"), 
-                        guide = "none") +
+  scale_color_manual(
+    values = cols_dem,
+    name = "Age at onset"
+  ) +
+  scale_linetype_manual(
+    values = c("Empirical" = "solid", "Simulated" = "22"),
+    guide = "none"
+  ) +
   coord_cartesian(xlim = c(0, 20)) +
   theme_bw() +
   theme(legend.position = "top",

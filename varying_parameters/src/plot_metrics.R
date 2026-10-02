@@ -2,7 +2,7 @@
 library(tidyverse)
 library(ggplot2)
 library(scales)
-library(wesanderson)
+library(RColorBrewer)
 
 # Access Snakemake objects
 sets <- snakemake@params$sets
@@ -14,18 +14,18 @@ current_dir <- basename(getwd())
 
 # Dynamic title and x_label mapping
 labels <- list(
-  "age_onset_monogenic" = list(title = "(C) Varying onset of monogenic ALS", x_label = "Shift in onset of monogenic ALS (years)"),
-  "age_onset_polygenic" = list(title = "(D) Varying onset of polygenic ALS", x_label = "Shift in onset of polygenic ALS (years)"),
-  "c9_daf" = list(title = "(E) Varying ALS-FTD-common disease allele frequency", x_label = "ALS-FTD-common disease allele frequency"),
-  "c9_penetrance" = list(title = "(F) Varying ALS-FTD-common disease allele penetrance", x_label = "ALS-FTD-common disease allele penetrance"),
-  "fussod_daf" = list(title = "(G) Varying ALS-FTD-rare disease allele frequency", x_label = "ALS-FTD-rare disease allele frequency"),
-  "fussod_penetrance" = list(title = "(H) Varying ALS-FTD-rare disease allele penetrance", x_label = "ALS-FTD-rare disease allele penetrance"),
+  "age_onset_monogenic" = list(title = "(A) Varying onset of monogenic ALS", x_label = "Shift in onset of monogenic ALS (years)"),
+  "age_onset_polygenic" = list(title = "(B) Varying onset of polygenic ALS", x_label = "Shift in onset of polygenic ALS (years)"),
+  "c9_daf" = list(title = "(C) Varying ALS-FTD moderate disease allele frequency", x_label = "ALS-FTD moderate disease allele frequency"),
+  "c9_penetrance" = list(title = "(D) Varying ALS-FTD moderate disease allele penetrance", x_label = "ALS-FTD moderate disease allele penetrance"),
+  "fussod_daf" = list(title = "(E) Varying ALS high disease allele frequency", x_label = "ALS high disease allele frequency"),
+  "fussod_penetrance" = list(title = "(F) Varying ALS high disease allele penetrance", x_label = "ALS high disease allele penetrance"),
   "fert_rate" = list(title = "(A) Varying fertility rate", x_label = "Fertility rate per generation"),
-  "genetic_correlation" = list(title = "(K) Varying genetic correlation between ALS~FTD", x_label = "Genetic correlation ALS~FTD"),
-  "heritability_ALS" = list(title = "(J) Varying ALS heritability", x_label = "ALS heritability (h2)"),
+  "genetic_correlation" = list(title = "(I) Varying genetic correlation between ALS~FTD", x_label = "Genetic correlation ALS~FTD"),
+  "heritability_ALS" = list(title = "(H) Varying ALS heritability", x_label = "ALS heritability (h2)"),
   "life_exp" = list(title = "(B) Varying mean life expectancy", x_label = "Mean life expectancy per individual"),
-  "lifetime_risk_ALS" = list(title = "(I) Varying ALS lifetime risk", x_label = "ALS lifetime risk (K)"),
-  "simulation_year" = list(title = "(L) Varying censoring years when running simulation", x_label = "Simulation censoring year")
+  "lifetime_risk_ALS" = list(title = "(G) Varying ALS lifetime risk", x_label = "ALS lifetime risk (K)"),
+  "simulation_year" = list(title = "(C) Varying censoring years when running simulation", x_label = "Simulation censoring year")
 )
 
 # Get labels for current directory (with fallback)
@@ -71,8 +71,8 @@ main_metrics <- plot_data %>%
   ) %>%
   filter(!is.na(Metric))
 
-# Colors (only for Sensitivity and PPV since that's what error bars show)
-darjeeling_colors <- wes_palette("Darjeeling1")[c(1, 2)]
+# First and third colours from the four-colour ColorBrewer RdBu palette
+rdbu_colors <- RColorBrewer::brewer.pal(4, "RdBu")[c(1, 4)]
 
 # Create the plot
 p <- ggplot(main_metrics, aes(x = set_num, y = Value, color = Metric)) +
@@ -121,7 +121,7 @@ p <- ggplot(main_metrics, aes(x = set_num, y = Value, color = Metric)) +
     expand = expansion(mult = c(0, 0.06))
   ) +
   scale_color_manual(
-    values = darjeeling_colors, 
+    values = rdbu_colors, 
     breaks = c("Sensitivity", "PPV")
   ) +
   labs(
