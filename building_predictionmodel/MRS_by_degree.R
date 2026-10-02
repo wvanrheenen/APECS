@@ -38,30 +38,6 @@ group_labels <- setNames(
 
 # Define 4 scenario sets
 disease_scenarios <- list(
-  ALS = list(
-    name = "ALS-affected relatives",
-    scenarios = list(
-      "1st degree relatives" = c("relatives_1st_als"),
-      "1st and 2nd degree relatives" = c("relatives_1st_als", "relatives_2nd_als"), 
-      "1st, 2nd, and 3rd degree relatives" = c("relatives_1st_als", "relatives_2nd_als", "relatives_3rd_als")
-    )
-  ),
-  FTD = list(
-    name = "FTD-affected relatives",
-    scenarios = list(
-      "1st degree relatives" = c("relatives_1st_ftd"),
-      "1st and 2nd degree relatives" = c("relatives_1st_ftd", "relatives_2nd_ftd"), 
-      "1st, 2nd, and 3rd degree relatives" = c("relatives_1st_ftd", "relatives_2nd_ftd", "relatives_3rd_ftd")
-    )
-  ),
-  dementia = list(
-    name = "Dementia-affected relatives",
-    scenarios = list(
-      "1st degree relatives" = c("relatives_1st_dementia"),
-      "1st and 2nd degree relatives" = c("relatives_1st_dementia", "relatives_2nd_dementia"), 
-      "1st, 2nd, and 3rd degree relatives" = c("relatives_1st_dementia", "relatives_2nd_dementia", "relatives_3rd_dementia")
-    )
-  ),
   ALS_FTD = list(
     name = "ALS or FTD-affected relatives",
     scenarios = list(
@@ -103,9 +79,9 @@ create_horizontal_mrs_plot <- function(data, scenario_name, show_legend = TRUE) 
     ) +
     # Legend: keep categorical labels, but ensure any numbers use commas
     scale_fill_manual(
-      values = c(
-        ">4" = "#DC143C", "4" = "#FF6347", "3" = "#FFA500",
-        "2" = "#FFD700", "1" = "#90EE90", "0" = "#2E8B57"
+      values = setNames(
+        RColorBrewer::brewer.pal(n = 6, name = "RdBu"),
+        c(">4", "4", "3", "2", "1", "0")
       ),
       breaks = levels(data$total_affected_cat_legend),
       labels = levels(data$total_affected_cat_legend),
@@ -176,7 +152,7 @@ for (disease_key in names(disease_scenarios)) {
     )
   
   # Save
-  filename <- paste0("mrs_relatives/", tolower(disease_key), "_degree_mrs_plots.pdf")
+  filename <- paste0("mrs_relatives/", tolower(disease_key), "_degree_mrs_plots_colourblind.pdf")
   ggsave(filename, combined_plot, width = 9, height = 11, dpi = 600)
   cat("✔", disease_info$name, "plots saved to", filename, "\n")
 }

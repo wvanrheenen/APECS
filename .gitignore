@@ -10,6 +10,8 @@
 .gitignore
 
 # Directories not to upload
+old_code
+pipo
 heritability_contribution
 ibdsim
 logs
