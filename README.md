@@ -17,7 +17,7 @@ This is a list of the subdirectories in our main github page:
   - A separate README.md file will follow for explanation on each rationale step.
 - data:
   - This directory contains gathered and processed real world demographic and genetic data required as input to run the simulations.
-- ALPINE_plug:
+- cryptic_distant_relatedness:
   - This directory contains a pipeline needed to run analyses on cryptic distant relatives in monogenic index patient pedigrees.
 - rshiny_slider:
   - This directory contains the pipeline used to generate the 'Variable parameters' tab of the web-based probability calculator
